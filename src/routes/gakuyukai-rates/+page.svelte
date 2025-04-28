@@ -3,6 +3,7 @@
   import { open, save } from "@tauri-apps/plugin-dialog";
   import { page } from "$app/stores";
   import { onMount } from "svelte";
+  import { message } from "@tauri-apps/plugin-dialog";
 
   interface CircleInfo {
     name: string;
@@ -52,6 +53,7 @@
       }
     } catch (error) {
       console.error("Error calculating rates via path parameter:", error);
+      message(error as string, { title: "Tauri", kind: "warning" });
     } finally {
       loading = false;
     }
@@ -75,12 +77,14 @@
           result = convertSingleToMultiple(singleResult);
         } catch (error) {
           console.error("Error calculating rate:", error);
+          message(error as string, { title: "Tauri", kind: "warning" });
         } finally {
           loading = false;
         }
       }
     } catch (error) {
       console.error("Error opening file dialog:", error);
+      message(error as string, { title: "Tauri", kind: "warning" });
     }
   }
 
@@ -100,12 +104,14 @@
           );
         } catch (error) {
           console.error("Error calculating rates:", error);
+          message(error as string, { title: "Tauri", kind: "warning" });
         } finally {
           loading = false;
         }
       }
     } catch (error) {
       console.error("Error opening folder dialog:", error);
+      message(error as string, { title: "Tauri", kind: "warning" });
     }
   }
 
@@ -125,6 +131,7 @@
         }
       } catch (error) {
         console.error("Error exporting to Excel:", error);
+        message(error as string, { title: "Tauri", kind: "warning" });
       }
     }
   }

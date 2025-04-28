@@ -5,6 +5,7 @@
     type DialogFilter,
     type OpenDialogOptions,
   } from "@tauri-apps/plugin-dialog";
+  import { message } from "@tauri-apps/plugin-dialog";
 
   // Infoの型定義
   type Info = {
@@ -29,7 +30,10 @@
     .then((data) => {
       info = data;
     })
-    .catch((e) => console.error(e));
+    .catch((e) => {
+      message(e, { title: "Tauri", kind: "warning" });
+      console.error(e);
+    });
 
   const filters: DialogFilter[] = [
     { name: "excel file", extensions: ["xlsx", "xls"] },
@@ -56,9 +60,13 @@
           })
           .catch((e) => {
             console.error(e);
+            message(e, { title: "Tauri", kind: "warning" });
           });
       })
-      .catch((e) => console.error(e));
+      .catch((e) => {
+        console.error(e);
+        message(e, { title: "Tauri", kind: "warning" });
+      });
   }
 
   function updateInfo() {
@@ -66,7 +74,10 @@
       .then((data) => {
         info = data;
       })
-      .catch((e) => console.error(e));
+      .catch((e) => {
+        console.error(e);
+        message(e, { title: "Tauri", kind: "warning" });
+      });
   }
 
   function checkExcelFilePath(path: string) {

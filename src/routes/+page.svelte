@@ -6,6 +6,7 @@
     type DialogFilter,
     type OpenDialogOptions,
   } from "@tauri-apps/plugin-dialog";
+  import { confirm } from "@tauri-apps/plugin-dialog";
 
   let coreMsg = $state("");
   let member = $state("");
