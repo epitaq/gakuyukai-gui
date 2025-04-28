@@ -11,10 +11,12 @@
     gakuyukai_member_count: number;
     rate_string: string;
   }
+
   interface CircleGakuyukaiRates {
     circles: CircleInfo[];
     error_file_path: string[];
   }
+
   let result: CircleGakuyukaiRates | null = null;
   let loading = false;
 
@@ -28,7 +30,6 @@
   onMount(() => {
     const path = $page.url.searchParams.get("path");
     const mode = $page.url.searchParams.get("mode");
-
     if (path && mode) {
       handlePathCalculation(path, mode);
     }
@@ -135,10 +136,10 @@
   }
 </script>
 
-<!-- HTML (unchanged) -->
-<div class="max-w-6xl mx-auto">
+<!-- HTML -->
+<div class="max-w-6xl mx-auto p-4">
   <!-- ヘッダー -->
-  <div class="flex justify-between items-center mb-8">
+  <div class="flex justify-between items-center mb-4">
     <div>
       <h2 class="text-xl font-medium text-[--macos-text-primary]">学友会率</h2>
       <p class="text-[--macos-text-secondary] mt-1">
@@ -158,74 +159,81 @@
       </button>
     </div>
   </div>
-
-  {#if loading}
-    <div class="flex justify-center items-center py-8">
-      <p class="text-[--macos-text-secondary]">処理中...</p>
-    </div>
-  {/if}
-
-  {#if result?.circles.length}
-    <div class="card" style="max-height: 60vh;">
-      <div class="flex justify-between items-center mb-6">
-        <h3 class="text-lg font-medium text-[--macos-text-primary]">結果</h3>
-        {#if result}
-          <button
-            class="btn btn-primary"
-            on:click={exportToExcel}
-            disabled={loading}
-          >
-            エクスポート
-          </button>
-        {/if}
+  <div>
+    {#if loading}
+      <div class="flex justify-center items-center py-8">
+        <p class="text-[--macos-text-secondary]">処理中...</p>
       </div>
-
-      <div class="overflow-auto max-h-[400px]">
-        <table>
-          <thead>
-            <tr>
-              <th>団体名</th>
-              <th>総メンバー数</th>
-              <th>学友会メンバー数</th>
-              <th>学友会率</th>
-            </tr>
-          </thead>
-          <tbody>
-            {#each result.circles as circle, index}
+    {/if}
+    {#if result?.circles.length}
+      <div class="card mb-4">
+        <div class="flex justify-between items-center mb-2">
+          <h3 class="text-lg font-medium text-[--macos-text-primary]">結果</h3>
+          {#if result}
+            <button
+              class="btn btn-primary"
+              on:click={exportToExcel}
+              disabled={loading}
+            >
+              エクスポート
+            </button>
+          {/if}
+        </div>
+        <div class="scrollable">
+          <table class="min-w-full">
+            <thead>
               <tr>
-                <td>
-                  <input
-                    type="text"
-                    class="w-full"
-                    value={circle.name}
-                    on:input={(e) =>
-                      updateCircleName(
-                        index,
-                        (e.target as HTMLInputElement).value,
-                      )}
-                  />
-                </td>
-                <td>{circle.member_count}</td>
-                <td>{circle.gakuyukai_member_count}</td>
-                <td>{circle.rate_string}</td>
+                <th>団体名</th>
+                <th>総メンバー数</th>
+                <th>学友会メンバー数</th>
+                <th>学友会率</th>
               </tr>
-            {/each}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {#each result.circles as circle, index}
+                <tr>
+                  <td>
+                    <input
+                      type="text"
+                      class="w-full"
+                      value={circle.name}
+                      on:input={(e) =>
+                        updateCircleName(
+                          index,
+                          (e.target as HTMLInputElement).value,
+                        )}
+                    />
+                  </td>
+                  <td>{circle.member_count}</td>
+                  <td>{circle.gakuyukai_member_count}</td>
+                  <td>{circle.rate_string}</td>
+                </tr>
+              {/each}
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
-  {/if}
-
-  {#if result?.error_file_path.length}
-    <div class="card mt-8 border-red-200" style="max-height: 30vh;">
-      <h3 class="text-lg font-medium text-red-600 mb-4">エラーファイル</h3>
-      <div class="overflow-auto max-h-[200px]">
-        <ul class="space-y-2">
+    {/if}
+    {#if result?.error_file_path.length}
+      <div class="card border-red-200">
+        <h3 class="text-lg font-medium text-red-600 mb-2">エラーファイル</h3>
+        <ul class="space-y-2 error-scrollable">
           {#each result.error_file_path as errorPath}
             <li class="text-red-500">{errorPath}</li>
           {/each}
         </ul>
       </div>
-    </div>
-  {/if}
+    {/if}
+  </div>
 </div>
+
+<style>
+  .scrollable {
+    overflow-y: auto;
+    max-height: 50vh;
+  }
+  .error-scrollable {
+    overflow-y: auto;
+    max-height: 10vh;
+  }
+</style>

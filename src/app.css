@@ -51,10 +51,12 @@ body {
 
 /* ボタンスタイル */
 .btn {
-  @apply px-4 py-2 rounded-md transition-colors duration-200 font-medium;
+  @apply px-2 py-1 rounded-md transition-colors duration-200 font-medium;
   background-color: var(--macos-bg-secondary);
   border: 1px solid var(--macos-border);
   color: var(--macos-text-primary);
+  font-size: 0.875rem;
+  /* Smaller font size */
 }
 
 .btn:hover {
@@ -90,7 +92,7 @@ select:focus {
 
 /* カードスタイル */
 .card {
-  @apply p-6 rounded-lg;
+  @apply p-4 rounded-lg;
   background-color: var(--macos-bg-primary);
   border: 1px solid var(--macos-border-light);
 }
@@ -101,14 +103,14 @@ table {
 }
 
 th {
-  @apply py-3 px-4 text-left font-medium;
+  @apply py-1 px-4 text-left font-medium;
   background-color: var(--macos-bg-secondary);
   color: var(--macos-text-secondary);
   border-bottom: 1px solid var(--macos-border);
 }
 
 td {
-  @apply py-3 px-4;
+  @apply py-1 px-4;
   border-bottom: 1px solid var(--macos-border-light);
 }
 
