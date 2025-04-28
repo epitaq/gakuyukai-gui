@@ -75,43 +75,14 @@
     );
   }
 
+  import { goto } from "$app/navigation";
+
   function callWrapCalculateGakuyukaiRate() {
-    const optionDialog: OpenDialogOptions = {
-      title: "file dialog",
-      filters: [{ name: "excel file", extensions: ["xlsx", "xls"] }],
-      multiple: false,
-      directory: false,
-    };
-
-    open(optionDialog)
-      .then((path) => {
-        if (path === null) return;
-
-        invoke("wrap_calculate_gakuyukai_rate", { path })
-          .then((rate) => {
-            console.log(rate);
-          })
-          .catch((e) => console.log(e));
-      })
-      .catch((e) => console.error(e));
+    goto("/gakuyukai-rates?mode=single");
   }
-  function callWrapCalculateGakuyukaiRates() {
-    const optionDialog: OpenDialogOptions = {
-      title: "file dialog",
-      multiple: false,
-      directory: true,
-    };
 
-    open(optionDialog)
-      .then((path) => {
-        if (path === null) return;
-        invoke("wrap_calculate_gakuyukai_rates", { path })
-          .then((rate) => {
-            console.log(rate);
-          })
-          .catch((e) => console.log(e));
-      })
-      .catch((e) => console.error(e));
+  function callWrapCalculateGakuyukaiRates() {
+    goto("/gakuyukai-rates?mode=multiple");
   }
 </script>
 
