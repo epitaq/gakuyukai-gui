@@ -135,131 +135,107 @@
   }
 </script>
 
-<!-- HTML (unchanged) -->
-<div class="container">
-  <div class="tabs">
-    <button
-      class="file-select-btn"
-      on:click={handleSingleFileSelect}
-      disabled={loading}
-    >
-      単一ファイルを選択
-    </button>
-    <button
-      class="file-select-btn"
-      on:click={handleMultipleFolderSelect}
-      disabled={loading}
-    >
-      フォルダを選択
-    </button>
+<!-- HTML部分 -->
+<div class="max-w-6xl mx-auto">
+  <!-- ヘッダー -->
+  <div class="flex justify-between items-center mb-8">
+    <div>
+      <h2 class="text-xl font-medium text-[--macos-text-primary]">学友会率</h2>
+      <p class="text-[--macos-text-secondary] mt-1">
+        団体ごとの学友会率を計算します
+      </p>
+    </div>
+    <div class="flex gap-4">
+      <button class="btn" on:click={handleSingleFileSelect} disabled={loading}>
+        ファイルを選択
+      </button>
+      <button
+        class="btn"
+        on:click={handleMultipleFolderSelect}
+        disabled={loading}
+      >
+        フォルダを選択
+      </button>
+    </div>
   </div>
   {#if loading}
-    <p>処理中...</p>
-  {/if}
-  {#if result?.circles.length}
-    <div class="tab-content" style="overflow: scroll; height: 400px;">
-      <h3>結果</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>団体名</th>
-            <th>総メンバー数</th>
-            <th>学友会メンバー数</th>
-            <th>学友会率</th>
-          </tr>
-        </thead>
-        <tbody>
-          {#each result.circles as circle, index}
-            <tr>
-              <td>
-                <input
-                  type="text"
-                  value={circle.name}
-                  on:input={(e) =>
-                    updateCircleName(
-                      index,
-                      (e.target as HTMLInputElement).value,
-                    )}
-                />
-              </td>
-              <td>{circle.member_count}</td>
-              <td>{circle.gakuyukai_member_count}</td>
-              <td>{circle.rate_string}</td>
-            </tr>
-          {/each}
-        </tbody>
-      </table>
+    <div class="flex justify-center items-center py-8">
+      <p class="text-[--macos-text-secondary]">処理中...</p>
     </div>
   {/if}
-  {#if result}
-    <button class="file-select-btn" on:click={exportToExcel} disabled={loading}>
-      エクスポート
-    </button>
+  {#if result?.circles.length}
+    <div class="card">
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="text-lg font-medium text-[--macos-text-primary]">結果</h3>
+        {#if result}
+          <button
+            class="btn btn-primary"
+            on:click={exportToExcel}
+            disabled={loading}
+          >
+            エクスポート
+          </button>
+        {/if}
+      </div>
+      <div class="scrollable">
+        <!-- スクロール可能に変更 -->
+        <table>
+          <thead>
+            <tr>
+              <th>団体名</th>
+              <th>総メンバー数</th>
+              <th>学友会メンバー数</th>
+              <th>学友会率</th>
+            </tr>
+          </thead>
+          <tbody>
+            {#each result.circles as circle, index}
+              <tr>
+                <td>
+                  <input
+                    type="text"
+                    class="w-full"
+                    value={circle.name}
+                    on:input={(e) =>
+                      updateCircleName(
+                        index,
+                        (e.target as HTMLInputElement).value,
+                      )}
+                  />
+                </td>
+                <td>{circle.member_count}</td>
+                <td>{circle.gakuyukai_member_count}</td>
+                <td>{circle.rate_string}</td>
+              </tr>
+            {/each}
+          </tbody>
+        </table>
+      </div>
+    </div>
   {/if}
   {#if result?.error_file_path.length}
-    <div class="error-section">
-      <h3>エラーファイル</h3>
-      <ul>
-        {#each result.error_file_path as errorPath}
-          <li>{errorPath}</li>
-        {/each}
-      </ul>
+    <div class="card mt-8 border-red-200">
+      <!-- スクロール可能に変更 -->
+      <h3 class="text-lg font-medium text-red-600 mb-4">エラーファイル</h3>
+      <div>
+        <ul class="space-y-2 error-scrollable">
+          {#each result.error_file_path as errorPath}
+            <li class="text-red-500">{errorPath}</li>
+          {/each}
+        </ul>
+      </div>
     </div>
   {/if}
 </div>
 
 <style>
-  /* Styles (unchanged) */
-  .container {
-    padding: 20px;
+  .scrollable {
+    overflow: auto;
+    max-height: 35vh; /* Adjust this height based on your design preferences */
   }
-  .tabs {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-  }
-  .file-select-btn {
-    padding: 10px 20px;
-    background-color: #28a745;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  .file-select-btn:disabled {
-    background-color: #6c757d;
-    cursor: not-allowed;
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
-  }
-  th,
-  td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-  }
-  th {
-    background-color: #f8f9fa;
-  }
-  .error-section {
-    margin-top: 30px;
-    padding: 20px;
-    background-color: #fff3f3;
-    border-radius: 4px;
-  }
-  .error-section h3 {
-    color: #dc3545;
-    margin-bottom: 10px;
-  }
-  .error-section ul {
-    list-style-type: none;
-    padding: 0;
-  }
-  .error-section li {
-    color: #dc3545;
-    margin-bottom: 5px;
+
+  .error-scrollable {
+    overflow: auto; /* Adjust this height for error list */
+    max-height: 10vh;
   }
 </style>

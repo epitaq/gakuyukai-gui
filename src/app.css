@@ -1,10 +1,117 @@
 @import "tailwindcss";
 
+/* macOSシステムカラー変数 */
+:root {
+  /* アクセントカラー */
+  --macos-accent: #007AFF;
+  --macos-accent-dark: #0051A8;
+
+  /* テキストカラー */
+  --macos-text-primary: #000000;
+  --macos-text-secondary: #666666;
+  --macos-text-disabled: #999999;
+
+  /* 背景色 */
+  --macos-bg-primary: #FFFFFF;
+  --macos-bg-secondary: #F5F5F5;
+  --macos-bg-tertiary: #E5E5E5;
+
+  /* ボーダー色 */
+  --macos-border: #D1D1D1;
+  --macos-border-light: #E5E5E5;
+
+  /* システムグレー */
+  --macos-gray1: #8E8E93;
+  --macos-gray2: #AEAEB2;
+  --macos-gray3: #C7C7CC;
+  --macos-gray4: #D1D1D6;
+  --macos-gray5: #E5E5EA;
+  --macos-gray6: #F2F2F7;
+}
+
+/* システムフォント設定 */
 body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
   user-select: none;
   -webkit-user-select: none;
   -moz-user-select: none;
   cursor: default;
   overflow: hidden;
+  color: var(--macos-text-primary);
+  background-color: var(--macos-bg-primary);
+}
 
+/* ウィンドウスタイル */
+.window-frame {
+  border-radius: 10px;
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  background-color: var(--macos-bg-primary);
+  overflow: hidden;
+}
+
+/* ボタンスタイル */
+.btn {
+  @apply px-4 py-2 rounded-md transition-colors duration-200 font-medium;
+  background-color: var(--macos-bg-secondary);
+  border: 1px solid var(--macos-border);
+  color: var(--macos-text-primary);
+}
+
+.btn:hover {
+  background-color: var(--macos-bg-tertiary);
+}
+
+.btn-primary {
+  background-color: var(--macos-accent);
+  border: none;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--macos-accent-dark);
+}
+
+/* フォーム要素 */
+input[type="text"],
+input[type="number"],
+select {
+  @apply px-3 py-2 rounded-md border transition-colors duration-200;
+  border-color: var(--macos-border);
+  background-color: var(--macos-bg-primary);
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+select:focus {
+  @apply outline-none ring-2;
+  border-color: var(--macos-accent);
+  ring-color: var(--macos-accent);
+}
+
+/* カードスタイル */
+.card {
+  @apply p-6 rounded-lg;
+  background-color: var(--macos-bg-primary);
+  border: 1px solid var(--macos-border-light);
+}
+
+/* テーブルスタイル */
+table {
+  @apply w-full border-collapse;
+}
+
+th {
+  @apply py-3 px-4 text-left font-medium;
+  background-color: var(--macos-bg-secondary);
+  color: var(--macos-text-secondary);
+  border-bottom: 1px solid var(--macos-border);
+}
+
+td {
+  @apply py-3 px-4;
+  border-bottom: 1px solid var(--macos-border-light);
+}
+
+tr:hover {
+  background-color: var(--macos-gray6);
 }

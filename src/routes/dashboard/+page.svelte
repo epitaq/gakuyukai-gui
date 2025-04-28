@@ -105,66 +105,76 @@
   }
 </script>
 
-<div class="container mx-auto px-4 py-8">
-  <div class="bg-white rounded-lg shadow-lg p-6">
-    <!-- ヘッダー -->
-    <div class="flex justify-between items-center mb-8">
-      <h1 class="text-2xl font-bold text-gray-800">{info.name}</h1>
+<div class="max-w-6xl mx-auto">
+  <!-- ヘッダー -->
+  <div class="flex justify-between items-center mb-8">
+    <div>
+      <h2 class="text-xl font-medium text-[--macos-text-primary]">
+        {info.name || "メンバー統計"}
+      </h2>
+      <p class="text-[--macos-text-secondary] mt-1">学友会メンバーの統計情報</p>
+    </div>
+    <button class="btn btn-primary" on:click={openFileDialog}>
+      ファイルを選択
+    </button>
+  </div>
+
+  <!-- 統計カード -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- 総メンバー数 -->
+    <div class="card">
+      <h3 class="text-[--macos-text-secondary] font-medium mb-2">
+        総メンバー数
+      </h3>
+      <p class="text-4xl font-medium text-[--macos-accent]">
+        {info.member_count}
+      </p>
+      <p class="text-[--macos-text-secondary] mt-2">全体のメンバー数</p>
+    </div>
+
+    <!-- 学友会メンバー数 -->
+    <div class="card">
+      <h3 class="text-[--macos-text-secondary] font-medium mb-2">
+        学友会メンバー数
+      </h3>
+      <p class="text-4xl font-medium text-[--macos-accent]">
+        {info.gakuyukai_member_count}
+      </p>
+      <p class="text-[--macos-text-secondary] mt-2">学友会に所属するメンバー</p>
+    </div>
+
+    <!-- 比率 -->
+    <div class="card">
+      <h3 class="text-[--macos-text-secondary] font-medium mb-2">学友会比率</h3>
+      <p class="text-4xl font-medium text-[--macos-accent]">
+        {info.rate_string}
+      </p>
+      <p class="text-[--macos-text-secondary] mt-2">
+        全体に対する学友会メンバーの割合
+      </p>
+    </div>
+  </div>
+
+  <!-- 団体の処理 -->
+  <div class="card mt-8">
+    <h3 class="text-[--macos-text-secondary] font-medium mb-4">
+      団体の学友会率
+    </h3>
+    <div class="flex gap-4">
       <button
-        class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors"
-        on:click={openFileDialog}
+        type="button"
+        class="btn btn-primary"
+        on:click={callWrapCalculateGakuyukaiRate}
       >
         ファイルを選択
       </button>
-    </div>
-
-    <!-- 統計カード -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <!-- 総メンバー数 -->
-      <div class="bg-blue-50 rounded-lg p-6">
-        <h3 class="text-lg font-semibold text-gray-600 mb-2">総メンバー数</h3>
-        <p class="text-4xl font-bold text-blue-600">{info.member_count}</p>
-        <p class="text-sm text-gray-500 mt-2">全体のメンバー数</p>
-      </div>
-
-      <!-- 学友会メンバー数 -->
-      <div class="bg-green-50 rounded-lg p-6">
-        <h3 class="text-lg font-semibold text-gray-600 mb-2">
-          学友会メンバー数
-        </h3>
-        <p class="text-4xl font-bold text-green-600">
-          {info.gakuyukai_member_count}
-        </p>
-        <p class="text-sm text-gray-500 mt-2">学友会に所属するメンバー</p>
-      </div>
-
-      <!-- 比率 -->
-      <div class="bg-purple-50 rounded-lg p-6">
-        <h3 class="text-lg font-semibold text-gray-600 mb-2">学友会比率</h3>
-        <p class="text-4xl font-bold text-purple-600">{info.rate_string}</p>
-        <p class="text-sm text-gray-500 mt-2">
-          全体に対する学友会メンバーの割合
-        </p>
-      </div>
-      <!-- 団体の処理 -->
-      <div class="bg-purple-50 rounded-lg p-6">
-        <h3 class="text-lg font-semibold text-gray-600 mb-2">団体の学友会率</h3>
-        <p class="text-4xl font-bold text-purple-600"></p>
-        <button
-          type="button"
-          class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors"
-          on:click={callWrapCalculateGakuyukaiRate}
-        >
-          Excelファイルを選択
-        </button>
-        <button
-          type="button"
-          class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors"
-          on:click={callWrapCalculateGakuyukaiRates}
-        >
-          フォルダを選択
-        </button>
-      </div>
+      <button
+        type="button"
+        class="btn"
+        on:click={callWrapCalculateGakuyukaiRates}
+      >
+        フォルダを選択
+      </button>
     </div>
   </div>
 </div>

@@ -41,29 +41,42 @@
   }
 </script>
 
-<div class="container mx-auto px-4 py-8">
-  <div class="bg-white rounded-lg shadow-lg p-6">
-    <h1 class="text-2xl font-bold text-gray-800 mb-6">学友会メンバー管理</h1>
-
-    <div class="space-y-4">
-      <div class="flex items-center space-x-4">
-        <button
-          type="button"
-          class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors"
-          on:click={openFileDialog}
-        >
-          Excelファイルを選択
-        </button>
-      </div>
-
-      {#if coreMsg}
-        <div class="bg-gray-50 p-4 rounded-lg">
-          <p class="text-sm text-gray-600">選択されたファイル:</p>
-          <p class="text-gray-800 mt-1">{coreMsg}</p>
-          <p class="text-sm text-gray-600">エラーログ:</p>
-          <p class="text-gray-800 mt-1">{open_error}</p>
-        </div>
-      {/if}
+<div class="card max-w-2xl mx-auto">
+  <div class="space-y-6">
+    <div class="text-center mb-8">
+      <h2 class="text-xl font-medium text-[--macos-text-primary]">
+        学友会メンバー管理
+      </h2>
+      <p class="text-[--macos-text-secondary] mt-2">
+        Excelファイルから学友会メンバーを読み込みます
+      </p>
     </div>
+
+    <div class="flex justify-center">
+      <button type="button" class="btn btn-primary" onclick={openFileDialog}>
+        ファイルを選択
+      </button>
+    </div>
+
+    {#if coreMsg}
+      <div class="bg-[--macos-bg-secondary] rounded-lg p-4 mt-6">
+        <div class="space-y-3">
+          <div>
+            <h3 class="text-sm font-medium text-[--macos-text-secondary]">
+              選択されたファイル
+            </h3>
+            <p class="text-[--macos-text-primary] mt-1">{coreMsg}</p>
+          </div>
+          {#if open_error}
+            <div>
+              <h3 class="text-sm font-medium text-[--macos-text-secondary]">
+                エラーログ
+              </h3>
+              <p class="text-red-500 mt-1">{open_error}</p>
+            </div>
+          {/if}
+        </div>
+      </div>
+    {/if}
   </div>
 </div>
