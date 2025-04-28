@@ -135,7 +135,7 @@
   }
 </script>
 
-<!-- HTML部分 -->
+<!-- HTML (unchanged) -->
 <div class="max-w-6xl mx-auto">
   <!-- ヘッダー -->
   <div class="flex justify-between items-center mb-8">
@@ -158,13 +158,15 @@
       </button>
     </div>
   </div>
+
   {#if loading}
     <div class="flex justify-center items-center py-8">
       <p class="text-[--macos-text-secondary]">処理中...</p>
     </div>
   {/if}
+
   {#if result?.circles.length}
-    <div class="card">
+    <div class="card" style="max-height: 60vh;">
       <div class="flex justify-between items-center mb-6">
         <h3 class="text-lg font-medium text-[--macos-text-primary]">結果</h3>
         {#if result}
@@ -177,8 +179,8 @@
           </button>
         {/if}
       </div>
-      <div class="scrollable">
-        <!-- スクロール可能に変更 -->
+
+      <div class="overflow-auto max-h-[400px]">
         <table>
           <thead>
             <tr>
@@ -213,12 +215,12 @@
       </div>
     </div>
   {/if}
+
   {#if result?.error_file_path.length}
-    <div class="card mt-8 border-red-200">
-      <!-- スクロール可能に変更 -->
+    <div class="card mt-8 border-red-200" style="max-height: 30vh;">
       <h3 class="text-lg font-medium text-red-600 mb-4">エラーファイル</h3>
-      <div>
-        <ul class="space-y-2 error-scrollable">
+      <div class="overflow-auto max-h-[200px]">
+        <ul class="space-y-2">
           {#each result.error_file_path as errorPath}
             <li class="text-red-500">{errorPath}</li>
           {/each}
@@ -227,15 +229,3 @@
     </div>
   {/if}
 </div>
-
-<style>
-  .scrollable {
-    overflow: auto;
-    max-height: 35vh; /* Adjust this height based on your design preferences */
-  }
-
-  .error-scrollable {
-    overflow: auto; /* Adjust this height for error list */
-    max-height: 10vh;
-  }
-</style>
