@@ -77,12 +77,31 @@
 
   import { goto } from "$app/navigation";
 
-  function callWrapCalculateGakuyukaiRate() {
-    goto("/gakuyukai-rates?mode=single");
+  async function callWrapCalculateGakuyukaiRate() {
+    const selected = await open({
+      title: "file dialog",
+      filters: [{ name: "excel file", extensions: ["xlsx", "xls"] }],
+      multiple: false,
+      directory: false,
+    });
+
+    if (selected) {
+      goto(`/gakuyukai-rates?mode=single&path=${encodeURIComponent(selected)}`);
+    }
   }
 
-  function callWrapCalculateGakuyukaiRates() {
-    goto("/gakuyukai-rates?mode=multiple");
+  async function callWrapCalculateGakuyukaiRates() {
+    const selected = await open({
+      title: "file dialog",
+      multiple: false,
+      directory: true,
+    });
+
+    if (selected) {
+      goto(
+        `/gakuyukai-rates?mode=multiple&path=${encodeURIComponent(selected)}`,
+      );
+    }
   }
 </script>
 

@@ -56,8 +56,10 @@ fn wrap_calculate_gakuyukai_rates(
 }
 
 #[tauri::command]
-fn wrap_export_to_excel(rates: CircleGakuyukaiRates, path: &str) {
-    let _ = rates.export_to_excel(&path);
+fn wrap_export_to_excel(rates: CircleGakuyukaiRates, path: &str) -> Result<(), String> {
+    rates
+        .export_to_excel(path)
+        .map_err(|e| format!("Failed to export data to Excel: {}", e))
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -70,7 +72,7 @@ pub fn run() {
             tauri_plugin_log::Builder::new()
                 .target(Target::new(TargetKind::Stdout))
                 .target(Target::new(TargetKind::Webview))
-                .level(log::LevelFilter::Debug)
+                .level(log::LevelFilter::Info)
                 .format(|out, message, record| {
                     let level_color = match record.level() {
                         log::Level::Error => "\x1b[31m", // Red

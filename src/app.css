@@ -1,1 +1,10 @@
 @import "tailwindcss";
+
+body {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  cursor: default;
+  overflow: hidden;
+
+}
