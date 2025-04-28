@@ -33,6 +33,34 @@
   --macos-gray6: #FAFAFB;
 }
 
+/* ダークモード時に上書き */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --macos-text-primary: #F2F2F7;
+    --macos-text-secondary: #F2F2F7;
+    --macos-text-disabled: #666666;
+
+    --macos-bg-primary: #505157;
+    /* 指定されてたぐらいの暗め */
+    --macos-bg-secondary: #5C5C63;
+    --macos-bg-tertiary: #66666D;
+
+    --macos-card-bg: #626366;
+    /* カードも暗めだけど背景より明るい */
+    --macos-card-border: #707075;
+
+    --macos-border: #707075;
+    --macos-border-light: #7C7C82;
+
+    --macos-gray1: #8E8E93;
+    --macos-gray2: #636366;
+    --macos-gray3: #48484A;
+    --macos-gray4: #48484A;
+    --macos-gray5: #48484A;
+    --macos-gray6: #48484A;
+  }
+}
+
 /* システムフォント設定 */
 body {
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;

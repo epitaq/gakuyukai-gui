@@ -214,10 +214,10 @@
     {/if}
     {#if result?.error_file_path.length}
       <div class="card border-red-200">
-        <h3 class="text-red-600">エラーファイル</h3>
+        <h3 class="text-red-400">エラーファイル</h3>
         <ul class="space-y-2 error-scrollable">
           {#each result.error_file_path as errorPath}
-            <li class="text-red-500">{errorPath}</li>
+            <li class="text-red-400">{errorPath}</li>
           {/each}
         </ul>
       </div>
