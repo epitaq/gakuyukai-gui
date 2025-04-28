@@ -1,6 +1,7 @@
 use calamine::{open_workbook_auto, DataType, Reader};
 use cli_table::{format::Justify, print_stdout, Cell, Table, WithTitle};
 use log::{debug, error, info, warn};
+use rayon::prelude::*;
 use rust_xlsxwriter::{Format, FormatAlign, Workbook, XlsxError};
 use serde::{Deserialize, Serialize};
 use std::sync::Mutex;
@@ -261,35 +262,85 @@ impl GakuyukaiMembers {
         );
         debug!("Using members: {:?}", self.member_ids);
 
-        let mut gakuyukai_rates: CircleGakuyukaiRates = CircleGakuyukaiRates::new();
+        let mut gakuyukai_rates = CircleGakuyukaiRates::new();
         let excel_files: Vec<PathBuf> = read_dir_entries(directory_path)
             .map_err(|e| format!("Failed to read directory {}: {:?}", directory_path, e))?;
-        for file_path in excel_files
-            .iter()
-            .map(|path| path.to_string_lossy().into_owned())
-        {
-            if check_excel_file_path(&file_path) {
-                debug!("Processing file: {}", file_path);
-                let _result: Result<_, _> = self
-                    .calculate_gakuyukai_rate(&file_path)
-                    .and_then(|info: CircleInfo| {
-                        gakuyukai_rates.push(info);
-                        return Ok(());
-                    })
-                    .or_else(|err: String| {
-                        warn!("{}", err);
-                        gakuyukai_rates.push_error_file_path(file_path);
-                        return Err(err);
-                    });
-            } else {
-                warn!("Skipping non-Excel file: {}", file_path);
-                gakuyukai_rates.push_error_file_path(file_path);
-                continue;
+
+        // ここから並列化！
+        let results: Vec<(String, Result<CircleInfo, String>)> = excel_files
+            .par_iter()
+            .map(|path| {
+                let file_path = path.to_string_lossy().into_owned();
+                if check_excel_file_path(&file_path) {
+                    debug!("Processing file: {}", file_path);
+                    let result = self.calculate_gakuyukai_rate(&file_path);
+                    (file_path, result)
+                } else {
+                    warn!("Skipping non-Excel file: {}", &file_path);
+                    (
+                        file_path.clone(),
+                        Err(format!("Skipping non-Excel file: {}", &file_path)),
+                    )
+                }
+            })
+            .collect();
+
+        // 並列で出た結果を集める
+        for (file_path, result) in results {
+            match result {
+                Ok(info) => {
+                    gakuyukai_rates.push(info);
+                }
+                Err(err) => {
+                    warn!("{}", err);
+                    gakuyukai_rates.push_error_file_path(file_path);
+                }
             }
         }
+
         info!("Completed calculating rates for all files.");
-        return Ok(gakuyukai_rates);
+        Ok(gakuyukai_rates)
     }
+
+    //     pub fn calculate_gakuyukai_rates(
+    //         &self,
+    //         directory_path: &str,
+    //     ) -> Result<CircleGakuyukaiRates, String> {
+    //         info!(
+    //             "Calculating gakuyukai rates for directory: {}",
+    //             directory_path
+    //         );
+    //         debug!("Using members: {:?}", self.member_ids);
+
+    //         let mut gakuyukai_rates: CircleGakuyukaiRates = CircleGakuyukaiRates::new();
+    //         let excel_files: Vec<PathBuf> = read_dir_entries(directory_path)
+    //             .map_err(|e| format!("Failed to read directory {}: {:?}", directory_path, e))?;
+    //         for file_path in excel_files
+    //             .iter()
+    //             .map(|path| path.to_string_lossy().into_owned())
+    //         {
+    //             if check_excel_file_path(&file_path) {
+    //                 debug!("Processing file: {}", file_path);
+    //                 let _result: Result<_, _> = self
+    //                     .calculate_gakuyukai_rate(&file_path)
+    //                     .and_then(|info: CircleInfo| {
+    //                         gakuyukai_rates.push(info);
+    //                         return Ok(());
+    //                     })
+    //                     .or_else(|err: String| {
+    //                         warn!("{}", err);
+    //                         gakuyukai_rates.push_error_file_path(file_path);
+    //                         return Err(err);
+    //                     });
+    //             } else {
+    //                 warn!("Skipping non-Excel file: {}", file_path);
+    //                 gakuyukai_rates.push_error_file_path(file_path);
+    //                 continue;
+    //             }
+    //         }
+    //         info!("Completed calculating rates for all files.");
+    //         return Ok(gakuyukai_rates);
+    // }
 }
 
 impl Students {
