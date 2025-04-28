@@ -229,11 +229,13 @@
 
 <style>
   .scrollable {
-    overflow-y: auto;
+    overflow-y: scroll;
     max-height: 50vh;
+    overscroll-behavior: none;
   }
   .error-scrollable {
-    overflow-y: auto;
+    overflow-y: scroll;
     max-height: 10vh;
+    overscroll-behavior: none;
   }
 </style>

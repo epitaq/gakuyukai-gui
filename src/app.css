@@ -117,3 +117,10 @@ td {
 tr:hover {
   background-color: var(--macos-gray6);
 }
+
+thead {
+  th {
+    position: sticky;
+    top: 0;
+  }
+}
