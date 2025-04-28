@@ -114,9 +114,7 @@
       </h2>
       <p class="text-[--macos-text-secondary] mt-1">学友会メンバーの統計情報</p>
     </div>
-    <button class="btn btn-primary" on:click={openFileDialog}>
-      ファイルを選択
-    </button>
+    <button class="btn" on:click={openFileDialog}> ファイルを選択 </button>
   </div>
 
   <!-- 統計カード -->
