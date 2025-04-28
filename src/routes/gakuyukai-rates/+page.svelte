@@ -142,9 +142,7 @@
   <div class="flex justify-between items-center mb-4">
     <div>
       <h2 class="text-xl font-medium text-[--macos-text-primary]">学友会率</h2>
-      <p class="text-[--macos-text-secondary] mt-1">
-        団体ごとの学友会率を計算します
-      </p>
+      <p class="text-[--macos-text-secondary] mt-1">団体ごとの学友会率を計算</p>
     </div>
     <div class="flex gap-4">
       <button class="btn" on:click={handleSingleFileSelect} disabled={loading}>
@@ -216,7 +214,7 @@
     {/if}
     {#if result?.error_file_path.length}
       <div class="card border-red-200">
-        <h3 class="text-lg font-medium text-red-600 mb-2">エラーファイル</h3>
+        <h3 class="text-red-600">エラーファイル</h3>
         <ul class="space-y-2 error-scrollable">
           {#each result.error_file_path as errorPath}
             <li class="text-red-500">{errorPath}</li>

@@ -1,32 +1,36 @@
 @import "tailwindcss";
 
-/* macOSシステムカラー変数 */
 :root {
   /* アクセントカラー */
-  --macos-accent: #007AFF;
-  --macos-accent-dark: #0051A8;
+  --macos-accent: #3391FF;
+  --macos-accent-dark: #2271D1;
 
   /* テキストカラー */
-  --macos-text-primary: #000000;
-  --macos-text-secondary: #666666;
-  --macos-text-disabled: #999999;
+  --macos-text-primary: #1C1C1E;
+  --macos-text-secondary: #5E5E63;
+  --macos-text-disabled: #A0A0A5;
 
-  /* 背景色 */
-  --macos-bg-primary: #FFFFFF;
-  --macos-bg-secondary: #F5F5F5;
-  --macos-bg-tertiary: #E5E5E5;
+  /* 背景色（もっと明るめ） */
+  --macos-bg-primary: #D9D9DE;
+  /* ←背景をかなり明るくした */
+  --macos-bg-secondary: #E5E5EA;
+  --macos-bg-tertiary: #F2F2F7;
+
+  /* カード用背景 */
+  --macos-card-bg: #FFFFFF;
+  --macos-card-border: #D1D1D6;
 
   /* ボーダー色 */
-  --macos-border: #D1D1D1;
-  --macos-border-light: #E5E5E5;
+  --macos-border: #C7C7CC;
+  --macos-border-light: #E5E5EA;
 
   /* システムグレー */
-  --macos-gray1: #8E8E93;
-  --macos-gray2: #AEAEB2;
-  --macos-gray3: #C7C7CC;
-  --macos-gray4: #D1D1D6;
-  --macos-gray5: #E5E5EA;
-  --macos-gray6: #F2F2F7;
+  --macos-gray1: #AEAEB2;
+  --macos-gray2: #C7C7CC;
+  --macos-gray3: #D1D1D6;
+  --macos-gray4: #E5E5EA;
+  --macos-gray5: #F2F2F7;
+  --macos-gray6: #FAFAFB;
 }
 
 /* システムフォント設定 */
@@ -44,7 +48,7 @@ body {
 /* ウィンドウスタイル */
 .window-frame {
   border-radius: 10px;
-  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.5), 0 8px 10px -6px rgb(0 0 0 / 0.4);
   background-color: var(--macos-bg-primary);
   overflow: hidden;
 }
@@ -52,11 +56,10 @@ body {
 /* ボタンスタイル */
 .btn {
   @apply px-2 py-1 rounded-md transition-colors duration-200 font-medium;
-  background-color: var(--macos-bg-secondary);
+  background-color: var(--macos-card-bg);
   border: 1px solid var(--macos-border);
   color: var(--macos-text-primary);
   font-size: 0.875rem;
-  /* Smaller font size */
 }
 
 .btn:hover {
@@ -79,7 +82,8 @@ input[type="number"],
 select {
   @apply px-3 py-2 rounded-md border transition-colors duration-200;
   border-color: var(--macos-border);
-  background-color: var(--macos-bg-primary);
+  background-color: var(--macos-card-bg);
+  color: var(--macos-text-primary);
 }
 
 input[type="text"]:focus,
@@ -93,8 +97,10 @@ select:focus {
 /* カードスタイル */
 .card {
   @apply p-4 rounded-lg;
-  background-color: var(--macos-bg-primary);
-  border: 1px solid var(--macos-border-light);
+  background-color: var(--macos-card-bg);
+  border: 1px solid var(--macos-card-border);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  /* 高低差を表現 */
 }
 
 /* テーブルスタイル */
@@ -115,7 +121,7 @@ td {
 }
 
 tr:hover {
-  background-color: var(--macos-gray6);
+  background-color: var(--macos-gray5);
 }
 
 thead {
