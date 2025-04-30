@@ -428,6 +428,9 @@ impl CircleGakuyukaiRates {
         // 中央揃えフォーマット
         let center_format = Format::new().set_align(FormatAlign::Center);
 
+        // 学友会フラグ用のフォーマット
+        let gakuyukai_format = Format::new().set_align(FormatAlign::Center);
+
         // サマリーシートのヘッダーを書き込む
         summary.write_with_format(0, 0, "サークル名", &header_format)?;
         summary.write_with_format(0, 1, "学友会員率", &header_format)?;
@@ -470,12 +473,11 @@ impl CircleGakuyukaiRates {
                     let row = (j + 1) as u32;
                     member_sheet.write_with_format(row, 0, student.id as i32, &center_format)?;
                     member_sheet.write(row, 1, &student.name)?;
-                    member_sheet.write_with_format(
-                        row,
-                        2,
-                        student.is_gakuyukai.unwrap_or(false) as bool,
-                        &center_format,
-                    )?;
+                    let gakuyukai_status = match student.is_gakuyukai.unwrap_or(false) {
+                        true => "○",
+                        false => "",
+                    };
+                    member_sheet.write_with_format(row, 2, gakuyukai_status, &gakuyukai_format)?;
                 }
 
                 // メンバーシートの列幅を調整
