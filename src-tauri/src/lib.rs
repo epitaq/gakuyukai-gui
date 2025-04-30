@@ -1,6 +1,6 @@
 mod data_processing;
 
-use data_processing::{CircleGakuyukaiRates, CircleInfo, GakuyukaiMembers};
+use data_processing::{read_excel_rows, CircleGakuyukaiRates, CircleInfo, GakuyukaiMembers};
 use log::debug;
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 use tauri::Manager;
@@ -16,9 +16,11 @@ fn greet(name: &str) -> String {
 fn wrap_load_gakuyukai_members(
     state: tauri::State<'_, GakuyukaiMembers>,
     path: String,
+    id_row: i64,
+    is_row: i64,
 ) -> Result<(), String> {
     debug!("wrap_load_gakuyukai_members");
-    let _ = state.load_gakuyukai_members_self(&path)?;
+    let _ = state.load_gakuyukai_members_self(&path, id_row, is_row)?;
     Ok(())
 }
 
@@ -102,6 +104,7 @@ pub fn run() {
             wrap_calculate_gakuyukai_rate,
             wrap_calculate_gakuyukai_rates,
             wrap_export_to_excel,
+            read_excel_rows,
         ])
         .setup(|app| {
             let gakuyukai = GakuyukaiMembers::default();

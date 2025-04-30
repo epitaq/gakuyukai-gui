@@ -27,7 +27,12 @@
       .then((v) => {
         if (v === null) return;
         coreMsg = v;
-        invoke("wrap_load_gakuyukai_members", { path: v })
+        invoke("read_excel_rows", { path: v, numRows: 3 })
+          .then((rows) => console.log(rows))
+          .catch((e) => {
+            console.error(e);
+          });
+        invoke("wrap_load_gakuyukai_members", { path: v, idRow: 0, isRow: 2 })
           .then(() => {
             console.info("successful loading gakuyukai file");
             // ファイル読み込み成功後にダッシュボードページに遷移
