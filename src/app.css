@@ -68,7 +68,7 @@ body {
   -webkit-user-select: none;
   -moz-user-select: none;
   cursor: default;
-  overflow: hidden;
+  /* overflow: hidden; */
   color: var(--macos-text-primary);
   background-color: var(--macos-bg-primary);
 }
@@ -157,4 +157,22 @@ thead {
     position: sticky;
     top: 0;
   }
+}
+
+select {
+  @apply px-3 py-2 rounded-md border transition-colors duration-200;
+  border-color: var(--macos-border);
+  background-color: var(--macos-card-bg);
+  color: var(--macos-text-primary);
+  font-size: 0.875rem;
+  -webkit-appearance: none;
+  /* デフォルトの矢印を隠す */
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%23A0A0A5' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1.1em 1.1em;
+  padding-right: 2.5rem;
+  /* 矢印分のpaddingを追加 */
 }
