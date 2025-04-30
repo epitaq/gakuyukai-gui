@@ -53,15 +53,7 @@
         if (v === null) return;
 
         info.file_path = v;
-        invoke("wrap_load_gakuyukai_members", { path: v })
-          .then(() => {
-            console.info("successful loading gakuyukai file");
-            updateInfo();
-          })
-          .catch((e) => {
-            console.error(e);
-            message(e, { title: "Tauri", kind: "warning" });
-          });
+        goto(`/?path=${encodeURIComponent(v)}`);
       })
       .catch((e) => {
         console.error(e);
@@ -125,7 +117,7 @@
       </h2>
       <p class="text-[--macos-text-secondary] mt-1">学友会メンバーの統計情報</p>
     </div>
-    <button class="btn" on:click={openFileDialog}> ファイルを選択 </button>
+    <button class="btn" on:click={openFileDialog}> 更新 </button>
   </div>
 
   <!-- 統計カード -->
