@@ -189,8 +189,8 @@
             <thead>
               <tr>
                 <th>団体名</th>
-                <th>総メンバー数</th>
-                <th>学友会メンバー数</th>
+                <th>総数</th>
+                <th>学友会数</th>
                 <th>学友会率</th>
               </tr>
             </thead>

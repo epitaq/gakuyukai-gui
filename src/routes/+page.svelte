@@ -80,10 +80,10 @@
     <!-- File Selection Card -->
     <div class="text-center mb-8">
       <h2 class="text-xl font-medium text-[--macos-text-primary]">
-        学友会メンバー管理
+        学友会管理
       </h2>
       <p class="text-[--macos-text-secondary] mt-2">
-        Excelファイルから学友会メンバーを読み込みます
+        Excelファイルから学友会名簿を読み込みます
       </p>
     </div>
     <div class="flex justify-center">
@@ -189,7 +189,7 @@
           on:click={submitColumnSelection}
           disabled={$idColumnIndex === null || $isGakuyukaiColumnIndex === null}
         >
-          提出
+          学友会メンバーを読み込む
         </button>
       </div>
     </div>
