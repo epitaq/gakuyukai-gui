@@ -119,10 +119,10 @@ impl GakuyukaiMembers {
         member_count / total_count
     }
 
-    const ID_ROW: i64 = 0;
-    const IS_ROW: i64 = 2;
+    // const ID_ROW: i64 = 0;
+    // const IS_ROW: i64 = 2;
     /// 学友会メンバーのリストをExcelファイルから読み込む関数
-    pub fn load_gakuyukai_members(path: &str) -> Result<Self, String> {
+    pub fn load_gakuyukai_members(path: &str, id_row: i64, is_row: i64) -> Result<Self, String> {
         info!("Loading gakuyukai members from file: {}", path);
 
         let mut member_ids: Vec<i64> = Vec::new();
@@ -133,13 +133,10 @@ impl GakuyukaiMembers {
         debug!("Processing sheet: {}", sheet_name);
         if let Ok(range) = workbook.worksheet_range(&sheet_name) {
             debug!("range.width: {}", range.width());
-            if range.width() > GakuyukaiMembers::ID_ROW as usize
-                && range.width() > GakuyukaiMembers::IS_ROW as usize
-            {
+            if range.width() > id_row as usize && range.width() > is_row as usize {
                 for row in range.rows() {
-                    let student_id: Option<i64> = row[GakuyukaiMembers::ID_ROW as usize].as_i64();
-                    let is_gakuyukai_member: Option<bool> =
-                        row[GakuyukaiMembers::IS_ROW as usize].get_bool();
+                    let student_id: Option<i64> = row[id_row as usize].as_i64();
+                    let is_gakuyukai_member: Option<bool> = row[is_row as usize].get_bool();
                     if student_id.is_some_and(|id| (1_000_000..=9_999_999).contains(&id)) {
                         if is_gakuyukai_member.is_some_and(|g| g) {
                             member_ids.push(student_id.unwrap());
@@ -166,9 +163,14 @@ impl GakuyukaiMembers {
         });
     }
 
-    pub fn load_gakuyukai_members_self(&self, path: &str) -> Result<(), String> {
+    pub fn load_gakuyukai_members_self(
+        &self,
+        path: &str,
+        id_row: i64,
+        is_row: i64,
+    ) -> Result<(), String> {
         // Attempt to load the gakuyukai members from the given path
-        match GakuyukaiMembers::load_gakuyukai_members(path) {
+        match GakuyukaiMembers::load_gakuyukai_members(path, id_row, is_row) {
             Ok(gakuyukai) => {
                 // Acquire the lock and update the member_ids
                 let mut self_gakuyukai_id = self.member_ids.lock().unwrap();
@@ -580,4 +582,46 @@ pub fn check_excel_file_path(path: &str) -> bool {
     } else {
         return false;
     }
+}
+
+#[tauri::command]
+pub fn read_excel_rows(path: &str, num_rows: usize) -> Result<Vec<Vec<String>>, String> {
+    debug!("Reading rows from Excel file: {}", path);
+
+    if !check_excel_file_path(path) {
+        let message: String =
+            format!("Cannot open file {}. This path is not an Excel file.", path).to_string();
+        return Err(message);
+    }
+
+    // Attempt to open the workbook
+    let mut workbook =
+        open_workbook_auto(path).map_err(|_| format!("Failed to open file: {}", path))?;
+
+    // Obtain the first sheet's name
+    let sheet_names = workbook.sheet_names();
+    let sheet_name = sheet_names
+        .first()
+        .ok_or("No sheets found in the Excel file")?;
+
+    debug!("Reading up to {} rows from sheet: {}", num_rows, sheet_name);
+
+    // Attempt to obtain the range of data from the specified sheet
+    let range = workbook
+        .worksheet_range(sheet_name)
+        .map_err(|_| format!("Failed to read the range of sheet: {}", sheet_name))?;
+
+    // Collect the rows up to the specified number
+    let rows: Vec<Vec<String>> = range
+        .rows()
+        .take(num_rows)
+        .map(|row| row.to_vec().iter().map(|cell| cell.to_string()).collect())
+        .collect();
+
+    // Check if any rows were read
+    if rows.is_empty() {
+        return Err("No data found in the specified rows".to_string());
+    }
+
+    Ok(rows)
 }

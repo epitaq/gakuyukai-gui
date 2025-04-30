@@ -53,15 +53,7 @@
         if (v === null) return;
 
         info.file_path = v;
-        invoke("wrap_load_gakuyukai_members", { path: v })
-          .then(() => {
-            console.info("successful loading gakuyukai file");
-            updateInfo();
-          })
-          .catch((e) => {
-            console.error(e);
-            message(e, { title: "Tauri", kind: "warning" });
-          });
+        goto(`/?path=${encodeURIComponent(v)}`);
       })
       .catch((e) => {
         console.error(e);
@@ -121,35 +113,31 @@
   <div class="flex justify-between items-center mb-8">
     <div>
       <h2 class="text-xl font-medium text-[--macos-text-primary]">
-        {info.name || "メンバー統計"}
+        {info.name || "統計"}
       </h2>
-      <p class="text-[--macos-text-secondary] mt-1">学友会メンバーの統計情報</p>
+      <p class="text-[--macos-text-secondary] mt-1">学友会の統計情報</p>
     </div>
-    <button class="btn" on:click={openFileDialog}> ファイルを選択 </button>
+    <button class="btn" on:click={openFileDialog}> 更新 </button>
   </div>
 
   <!-- 統計カード -->
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    <!-- 総メンバー数 -->
+    <!-- 総数 -->
     <div class="card">
-      <h3 class="text-[--macos-text-secondary] font-medium mb-2">
-        総メンバー数
-      </h3>
+      <h3 class="text-[--macos-text-secondary] font-medium mb-2">総数</h3>
       <p class="text-4xl font-medium text-[--macos-accent]">
         {info.member_count}
       </p>
-      <p class="text-[--macos-text-secondary] mt-2">全体のメンバー数</p>
+      <p class="text-[--macos-text-secondary] mt-2">全体の人数</p>
     </div>
 
-    <!-- 学友会メンバー数 -->
+    <!-- 学友会数 -->
     <div class="card">
-      <h3 class="text-[--macos-text-secondary] font-medium mb-2">
-        学友会メンバー数
-      </h3>
+      <h3 class="text-[--macos-text-secondary] font-medium mb-2">学友会数</h3>
       <p class="text-4xl font-medium text-[--macos-accent]">
         {info.gakuyukai_member_count}
       </p>
-      <p class="text-[--macos-text-secondary] mt-2">学友会に所属するメンバー</p>
+      <p class="text-[--macos-text-secondary] mt-2">学友会に所属する人数</p>
     </div>
 
     <!-- 比率 -->
@@ -158,9 +146,7 @@
       <p class="text-4xl font-medium text-[--macos-accent]">
         {info.rate_string}
       </p>
-      <p class="text-[--macos-text-secondary] mt-2">
-        全体に対する学友会メンバーの割合
-      </p>
+      <p class="text-[--macos-text-secondary] mt-2">学友会に所属する人の割合</p>
     </div>
   </div>
 
