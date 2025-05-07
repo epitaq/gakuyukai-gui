@@ -189,7 +189,12 @@ impl GakuyukaiMembers {
         }
     }
 
-    pub fn calculate_gakuyukai_rate(&self, path: &str) -> Result<CircleInfo, String> {
+    pub fn calculate_gakuyukai_rate(
+        &self,
+        path: &str,
+        id_row: i64,
+        name_row: i64,
+    ) -> Result<CircleInfo, String> {
         info!("Calculating gakuyukai rate for file: {}", path);
 
         // ファイル形式のチェック
@@ -200,7 +205,7 @@ impl GakuyukaiMembers {
         }
 
         // サークルメンバーを読み込む
-        let circle_members: Vec<Student> = Students::load_circle_members(path)?
+        let circle_members: Vec<Student> = Students::load_circle_members(path, id_row, name_row)?
             .students
             .iter()
             .map(|s| Student {
@@ -257,6 +262,8 @@ impl GakuyukaiMembers {
     pub fn calculate_gakuyukai_rates(
         &self,
         directory_path: &str,
+        id_row: i64,
+        name_row: i64,
     ) -> Result<CircleGakuyukaiRates, String> {
         info!(
             "Calculating gakuyukai rates for directory: {}",
@@ -275,7 +282,7 @@ impl GakuyukaiMembers {
                 let file_path = path.to_string_lossy().into_owned();
                 if check_excel_file_path(&file_path) {
                     debug!("Processing file: {}", file_path);
-                    let result = self.calculate_gakuyukai_rate(&file_path);
+                    let result = self.calculate_gakuyukai_rate(&file_path, id_row, name_row);
                     (file_path, result)
                 } else {
                     warn!("Skipping non-Excel file: {}", &file_path);
@@ -303,56 +310,16 @@ impl GakuyukaiMembers {
         info!("Completed calculating rates for all files.");
         Ok(gakuyukai_rates)
     }
-
-    //     pub fn calculate_gakuyukai_rates(
-    //         &self,
-    //         directory_path: &str,
-    //     ) -> Result<CircleGakuyukaiRates, String> {
-    //         info!(
-    //             "Calculating gakuyukai rates for directory: {}",
-    //             directory_path
-    //         );
-    //         debug!("Using members: {:?}", self.member_ids);
-
-    //         let mut gakuyukai_rates: CircleGakuyukaiRates = CircleGakuyukaiRates::new();
-    //         let excel_files: Vec<PathBuf> = read_dir_entries(directory_path)
-    //             .map_err(|e| format!("Failed to read directory {}: {:?}", directory_path, e))?;
-    //         for file_path in excel_files
-    //             .iter()
-    //             .map(|path| path.to_string_lossy().into_owned())
-    //         {
-    //             if check_excel_file_path(&file_path) {
-    //                 debug!("Processing file: {}", file_path);
-    //                 let _result: Result<_, _> = self
-    //                     .calculate_gakuyukai_rate(&file_path)
-    //                     .and_then(|info: CircleInfo| {
-    //                         gakuyukai_rates.push(info);
-    //                         return Ok(());
-    //                     })
-    //                     .or_else(|err: String| {
-    //                         warn!("{}", err);
-    //                         gakuyukai_rates.push_error_file_path(file_path);
-    //                         return Err(err);
-    //                     });
-    //             } else {
-    //                 warn!("Skipping non-Excel file: {}", file_path);
-    //                 gakuyukai_rates.push_error_file_path(file_path);
-    //                 continue;
-    //             }
-    //         }
-    //         info!("Completed calculating rates for all files.");
-    //         return Ok(gakuyukai_rates);
-    // }
 }
 
 impl Students {
-    const ID_ROW: i64 = 3;
-    const NAME_ROW: i64 = 4;
+    // const ID_ROW: i64 = 3;
+    // const NAME_ROW: i64 = 4;
     // const ID_ROW: i64 = 0;
     // const NAME_ROW: i64 = 1;
 
     /// サークルメンバーの情報をExcelファイルから読み込む関数
-    fn load_circle_members(path: &str) -> Result<Self, String> {
+    fn load_circle_members(path: &str, id_row: i64, name_row: i64) -> Result<Self, String> {
         info!("Loading circle members from file: {}", path);
 
         let mut members: Vec<Student> = Vec::new();
@@ -360,12 +327,10 @@ impl Students {
         let sheet_names = workbook.sheet_names();
         let sheet_name = sheet_names.first().unwrap();
         if let Ok(range) = workbook.worksheet_range(&sheet_name) {
-            if range.width() > Students::ID_ROW as usize
-                && range.width() > Students::NAME_ROW as usize
-            {
+            if range.width() > id_row as usize && range.width() > name_row as usize {
                 for row in range.rows() {
-                    let student_id: Option<i64> = row[Students::ID_ROW as usize].as_i64();
-                    let student_name: Option<String> = row[Students::NAME_ROW as usize].as_string();
+                    let student_id: Option<i64> = row[id_row as usize].as_i64();
+                    let student_name: Option<String> = row[name_row as usize].as_string();
                     if student_id.is_some_and(|id| (1_000_000..=9_999_999).contains(&id))
                         && student_name.is_some()
                     {

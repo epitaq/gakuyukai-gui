@@ -42,19 +42,27 @@ fn wrap_get_info(state: tauri::State<'_, GakuyukaiMembers>) -> CircleInfo {
 fn wrap_calculate_gakuyukai_rate(
     state: tauri::State<'_, GakuyukaiMembers>,
     path: &str,
+    id_row: i64,
+    name_row: i64,
 ) -> Result<CircleInfo, String> {
     debug!("wrap_calculate_rakuyukai_rate");
-    state.calculate_gakuyukai_rate(&path)?.print();
-    return state.calculate_gakuyukai_rate(&path);
+    state
+        .calculate_gakuyukai_rate(&path, id_row, name_row)?
+        .print();
+    return state.calculate_gakuyukai_rate(&path, id_row, name_row);
 }
 #[tauri::command]
 fn wrap_calculate_gakuyukai_rates(
     state: tauri::State<'_, GakuyukaiMembers>,
     path: &str,
+    id_row: i64,
+    name_row: i64,
 ) -> Result<CircleGakuyukaiRates, String> {
     debug!("wrap_calculate_rakuyukai_rate");
-    state.calculate_gakuyukai_rates(&path)?.print();
-    return state.calculate_gakuyukai_rates(&path);
+    state
+        .calculate_gakuyukai_rates(&path, id_row, name_row)?
+        .print();
+    return state.calculate_gakuyukai_rates(&path, id_row, name_row);
 }
 
 #[tauri::command]

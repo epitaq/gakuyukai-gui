@@ -20,6 +20,8 @@
 
   let result: CircleGakuyukaiRates | null = null;
   let loading = false;
+  let idRow = 3;
+  let nameRow = 4;
 
   function convertSingleToMultiple(single: CircleInfo): CircleGakuyukaiRates {
     return {
@@ -42,13 +44,21 @@
       if (mode === "single") {
         const singleResult = await invoke<CircleInfo>(
           "wrap_calculate_gakuyukai_rate",
-          { path: decodeURIComponent(path) },
+          {
+            path: decodeURIComponent(path),
+            idRow,
+            nameRow,
+          },
         );
         result = convertSingleToMultiple(singleResult);
       } else if (mode === "multiple") {
         result = await invoke<CircleGakuyukaiRates>(
           "wrap_calculate_gakuyukai_rates",
-          { path: decodeURIComponent(path) },
+          {
+            path: decodeURIComponent(path),
+            idRow,
+            nameRow,
+          },
         );
       }
     } catch (error) {
@@ -72,7 +82,7 @@
         try {
           const singleResult = await invoke<CircleInfo>(
             "wrap_calculate_gakuyukai_rate",
-            { path: selected },
+            { path: selected, idRow, nameRow },
           );
           result = convertSingleToMultiple(singleResult);
         } catch (error) {
@@ -100,7 +110,7 @@
         try {
           result = await invoke<CircleGakuyukaiRates>(
             "wrap_calculate_gakuyukai_rates",
-            { path: selected },
+            { path: selected, idRow, nameRow },
           );
         } catch (error) {
           console.error("Error calculating rates:", error);
@@ -150,6 +160,30 @@
     <div>
       <h2 class="text-xl font-medium text-[--macos-text-primary]">学友会率</h2>
       <p class="text-[--macos-text-secondary] mt-1">団体ごとの学友会率を計算</p>
+      <div class="flex gap-4 mt-2">
+        <div class="flex items-center gap-2">
+          <label for="idRow" class="text-[--macos-text-secondary]">ID行:</label>
+          <input
+            type="number"
+            id="idRow"
+            bind:value={idRow}
+            min="0"
+            class="w-20 px-2 py-1 rounded border border-[--macos-border] bg-[--macos-background]"
+          />
+        </div>
+        <div class="flex items-center gap-2">
+          <label for="nameRow" class="text-[--macos-text-secondary]"
+            >名前行:</label
+          >
+          <input
+            type="number"
+            id="nameRow"
+            bind:value={nameRow}
+            min="1"
+            class="w-20 px-2 py-1 rounded border border-[--macos-border] bg-[--macos-background]"
+          />
+        </div>
+      </div>
     </div>
     <div class="flex gap-4">
       <button class="btn" on:click={handleSingleFileSelect} disabled={loading}>
