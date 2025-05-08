@@ -16,6 +16,9 @@
     rate_string: string;
   };
 
+  let idRow = 1;
+  let nameRow = 2;
+
   // 初期値を設定
   let info: Info = {
     name: "",
@@ -89,7 +92,9 @@
     });
 
     if (selected) {
-      goto(`/gakuyukai-rates?mode=single&path=${encodeURIComponent(selected)}`);
+      goto(
+        `/gakuyukai-rates?mode=single&path=${encodeURIComponent(selected)}&idRow=${idRow}&nameRow=${nameRow}`,
+      );
     }
   }
 
@@ -102,7 +107,7 @@
 
     if (selected) {
       goto(
-        `/gakuyukai-rates?mode=multiple&path=${encodeURIComponent(selected)}`,
+        `/gakuyukai-rates?mode=multiple&path=${encodeURIComponent(selected)}&idRow=${idRow}&nameRow=${nameRow}`,
       );
     }
   }
@@ -155,6 +160,34 @@
     <h3 class="text-[--macos-text-secondary] font-medium mb-4">
       団体の学友会率
     </h3>
+    <div class="flex gap-4 items-center mb-4">
+      <div class="flex items-center gap-2">
+        <label for="idRow" class="text-[--macos-text-secondary]">ID行:</label>
+        <select
+          id="idRow"
+          bind:value={idRow}
+          class="px-2 py-1 rounded border border-[--macos-border] bg-[--macos-background]"
+        >
+          {#each Array(10) as _, i}
+            <option value={i + 1}>{i + 1}行目</option>
+          {/each}
+        </select>
+      </div>
+      <div class="flex items-center gap-2">
+        <label for="nameRow" class="text-[--macos-text-secondary]"
+          >名前行:</label
+        >
+        <select
+          id="nameRow"
+          bind:value={nameRow}
+          class="px-2 py-1 rounded border border-[--macos-border] bg-[--macos-background]"
+        >
+          {#each Array(10) as _, i}
+            <option value={i + 1}>{i + 1}行目</option>
+          {/each}
+        </select>
+      </div>
+    </div>
     <div class="flex gap-4">
       <button
         type="button"

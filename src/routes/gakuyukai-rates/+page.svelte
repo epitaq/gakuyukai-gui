@@ -20,8 +20,8 @@
 
   let result: CircleGakuyukaiRates | null = null;
   let loading = false;
-  let idRow = 3;
-  let nameRow = 4;
+  let idRow = 1;
+  let nameRow = 2;
 
   function convertSingleToMultiple(single: CircleInfo): CircleGakuyukaiRates {
     return {
@@ -33,6 +33,17 @@
   onMount(() => {
     const path = $page.url.searchParams.get("path");
     const mode = $page.url.searchParams.get("mode");
+    const queryIdRow = $page.url.searchParams.get("idRow");
+    const queryNameRow = $page.url.searchParams.get("nameRow");
+
+    // クエリパラメータから値を設定
+    if (queryIdRow) {
+      idRow = parseInt(queryIdRow);
+    }
+    if (queryNameRow) {
+      nameRow = parseInt(queryNameRow);
+    }
+
     if (path && mode) {
       handlePathCalculation(path, mode);
     }
@@ -46,8 +57,8 @@
           "wrap_calculate_gakuyukai_rate",
           {
             path: decodeURIComponent(path),
-            idRow,
-            nameRow,
+            idRow: idRow - 1,
+            nameRow: nameRow - 1,
           },
         );
         result = convertSingleToMultiple(singleResult);
@@ -56,8 +67,8 @@
           "wrap_calculate_gakuyukai_rates",
           {
             path: decodeURIComponent(path),
-            idRow,
-            nameRow,
+            idRow: idRow - 1,
+            nameRow: nameRow - 1,
           },
         );
       }
@@ -82,7 +93,7 @@
         try {
           const singleResult = await invoke<CircleInfo>(
             "wrap_calculate_gakuyukai_rate",
-            { path: selected, idRow, nameRow },
+            { path: selected, idRow: idRow - 1, nameRow: nameRow - 1 },
           );
           result = convertSingleToMultiple(singleResult);
         } catch (error) {
@@ -110,7 +121,7 @@
         try {
           result = await invoke<CircleGakuyukaiRates>(
             "wrap_calculate_gakuyukai_rates",
-            { path: selected, idRow, nameRow },
+            { path: selected, idRow: idRow - 1, nameRow: nameRow - 1 },
           );
         } catch (error) {
           console.error("Error calculating rates:", error);
@@ -162,40 +173,50 @@
       <p class="text-[--macos-text-secondary] mt-1">団体ごとの学友会率を計算</p>
       <div class="flex gap-4 mt-2">
         <div class="flex items-center gap-2">
-          <label for="idRow" class="text-[--macos-text-secondary]">ID行:</label>
-          <input
-            type="number"
+          <label for="idRow" class="text-[--macos-text-secondary]"
+            >学籍番号列:</label
+          >
+          <select
             id="idRow"
             bind:value={idRow}
-            min="0"
-            class="w-20 px-2 py-1 rounded border border-[--macos-border] bg-[--macos-background]"
-          />
+            class="px-2 py-1 rounded border border-[--macos-border] bg-[--macos-background]"
+          >
+            {#each Array(10) as _, i}
+              <option value={i + 1}>{i + 1}列目</option>
+            {/each}
+          </select>
         </div>
         <div class="flex items-center gap-2">
           <label for="nameRow" class="text-[--macos-text-secondary]"
-            >名前行:</label
+            >名前列:</label
           >
-          <input
-            type="number"
+          <select
             id="nameRow"
             bind:value={nameRow}
-            min="1"
-            class="w-20 px-2 py-1 rounded border border-[--macos-border] bg-[--macos-background]"
-          />
+            class="px-2 py-1 rounded border border-[--macos-border] bg-[--macos-background]"
+          >
+            {#each Array(10) as _, i}
+              <option value={i + 1}>{i + 1}列目</option>
+            {/each}
+          </select>
+        </div>
+        <div class="flex gap-4">
+          <button
+            class="btn btn-primary"
+            on:click={handleSingleFileSelect}
+            disabled={loading}
+          >
+            ファイルを選択
+          </button>
+          <button
+            class="btn"
+            on:click={handleMultipleFolderSelect}
+            disabled={loading}
+          >
+            フォルダを選択
+          </button>
         </div>
       </div>
-    </div>
-    <div class="flex gap-4">
-      <button class="btn" on:click={handleSingleFileSelect} disabled={loading}>
-        ファイルを選択
-      </button>
-      <button
-        class="btn"
-        on:click={handleMultipleFolderSelect}
-        disabled={loading}
-      >
-        フォルダを選択
-      </button>
     </div>
   </div>
   <div>
