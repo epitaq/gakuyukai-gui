@@ -20,6 +20,8 @@
 
   let result: CircleGakuyukaiRates | null = null;
   let loading = false;
+  let idLine = 1;
+  let nameLine = 2;
 
   function convertSingleToMultiple(single: CircleInfo): CircleGakuyukaiRates {
     return {
@@ -31,6 +33,17 @@
   onMount(() => {
     const path = $page.url.searchParams.get("path");
     const mode = $page.url.searchParams.get("mode");
+    const queryIdLine = $page.url.searchParams.get("idLine");
+    const queryNameLine = $page.url.searchParams.get("nameLine");
+
+    // クエリパラメータから値を設定
+    if (queryIdLine) {
+      idLine = parseInt(queryIdLine);
+    }
+    if (queryNameLine) {
+      nameLine = parseInt(queryNameLine);
+    }
+
     if (path && mode) {
       handlePathCalculation(path, mode);
     }
@@ -42,13 +55,21 @@
       if (mode === "single") {
         const singleResult = await invoke<CircleInfo>(
           "wrap_calculate_gakuyukai_rate",
-          { path: decodeURIComponent(path) },
+          {
+            path: decodeURIComponent(path),
+            idLine: idLine - 1,
+            nameLine: nameLine - 1,
+          },
         );
         result = convertSingleToMultiple(singleResult);
       } else if (mode === "multiple") {
         result = await invoke<CircleGakuyukaiRates>(
           "wrap_calculate_gakuyukai_rates",
-          { path: decodeURIComponent(path) },
+          {
+            path: decodeURIComponent(path),
+            idLine: idLine - 1,
+            nameLine: nameLine - 1,
+          },
         );
       }
     } catch (error) {
@@ -72,7 +93,7 @@
         try {
           const singleResult = await invoke<CircleInfo>(
             "wrap_calculate_gakuyukai_rate",
-            { path: selected },
+            { path: selected, idLine: idLine - 1, nameLine: nameLine - 1 },
           );
           result = convertSingleToMultiple(singleResult);
         } catch (error) {
@@ -100,7 +121,7 @@
         try {
           result = await invoke<CircleGakuyukaiRates>(
             "wrap_calculate_gakuyukai_rates",
-            { path: selected },
+            { path: selected, idLine: idLine - 1, nameLine: nameLine - 1 },
           );
         } catch (error) {
           console.error("Error calculating rates:", error);
@@ -150,18 +171,52 @@
     <div>
       <h2 class="text-xl font-medium text-[--macos-text-primary]">学友会率</h2>
       <p class="text-[--macos-text-secondary] mt-1">団体ごとの学友会率を計算</p>
-    </div>
-    <div class="flex gap-4">
-      <button class="btn" on:click={handleSingleFileSelect} disabled={loading}>
-        ファイルを選択
-      </button>
-      <button
-        class="btn"
-        on:click={handleMultipleFolderSelect}
-        disabled={loading}
-      >
-        フォルダを選択
-      </button>
+      <div class="flex gap-4 mt-2">
+        <div class="flex items-center gap-2">
+          <label for="idLine" class="text-[--macos-text-secondary]"
+            >学籍番号:</label
+          >
+          <select
+            id="idLine"
+            bind:value={idLine}
+            class="px-2 py-1 rounded border border-[--macos-border] bg-[--macos-background]"
+          >
+            {#each Array(10) as _, i}
+              <option value={i + 1}>{i + 1}列目</option>
+            {/each}
+          </select>
+        </div>
+        <div class="flex items-center gap-2">
+          <label for="nameLine" class="text-[--macos-text-secondary]"
+            >名前:</label
+          >
+          <select
+            id="nameLine"
+            bind:value={nameLine}
+            class="px-2 py-1 rounded border border-[--macos-border] bg-[--macos-background]"
+          >
+            {#each Array(10) as _, i}
+              <option value={i + 1}>{i + 1}列目</option>
+            {/each}
+          </select>
+        </div>
+        <div class="flex gap-4">
+          <button
+            class="btn btn-primary"
+            on:click={handleSingleFileSelect}
+            disabled={loading}
+          >
+            ファイルを選択
+          </button>
+          <button
+            class="btn"
+            on:click={handleMultipleFolderSelect}
+            disabled={loading}
+          >
+            フォルダを選択
+          </button>
+        </div>
+      </div>
     </div>
   </div>
   <div>
@@ -221,7 +276,7 @@
     {/if}
     {#if result?.error_file_path.length}
       <div class="card border-red-200">
-        <h3 class="text-red-400">エラーファイル</h3>
+        <h3 class="text-red-400">エラー</h3>
         <ul class="space-y-2 error-scrollable">
           {#each result.error_file_path as errorPath}
             <li class="text-red-400">{errorPath}</li>

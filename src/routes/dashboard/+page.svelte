@@ -16,6 +16,9 @@
     rate_string: string;
   };
 
+  let idLine = 1;
+  let nameLine = 2;
+
   // 初期値を設定
   let info: Info = {
     name: "",
@@ -89,7 +92,9 @@
     });
 
     if (selected) {
-      goto(`/gakuyukai-rates?mode=single&path=${encodeURIComponent(selected)}`);
+      goto(
+        `/gakuyukai-rates?mode=single&path=${encodeURIComponent(selected)}&idLine=${idLine}&nameLine=${nameLine}`,
+      );
     }
   }
 
@@ -102,7 +107,7 @@
 
     if (selected) {
       goto(
-        `/gakuyukai-rates?mode=multiple&path=${encodeURIComponent(selected)}`,
+        `/gakuyukai-rates?mode=multiple&path=${encodeURIComponent(selected)}&idLine=${idLine}&nameLine=${nameLine}`,
       );
     }
   }
@@ -142,7 +147,7 @@
 
     <!-- 比率 -->
     <div class="card">
-      <h3 class="text-[--macos-text-secondary] font-medium mb-2">学友会比率</h3>
+      <h3 class="text-[--macos-text-secondary] font-medium mb-2">学友会率</h3>
       <p class="text-4xl font-medium text-[--macos-accent]">
         {info.rate_string}
       </p>
@@ -155,6 +160,35 @@
     <h3 class="text-[--macos-text-secondary] font-medium mb-4">
       団体の学友会率
     </h3>
+    <div class="flex gap-4 items-center mb-4">
+      <div class="flex items-center gap-2">
+        <label for="idLine" class="text-[--macos-text-secondary]"
+          >学籍番号:</label
+        >
+        <select
+          id="idLine"
+          bind:value={idLine}
+          class="px-2 py-1 rounded border border-[--macos-border] bg-[--macos-background]"
+        >
+          {#each Array(10) as _, i}
+            <option value={i + 1}>{i + 1}列目</option>
+          {/each}
+        </select>
+      </div>
+      <div class="flex items-center gap-2">
+        <label for="nameLine" class="text-[--macos-text-secondary]">名前:</label
+        >
+        <select
+          id="nameLine"
+          bind:value={nameLine}
+          class="px-2 py-1 rounded border border-[--macos-border] bg-[--macos-background]"
+        >
+          {#each Array(10) as _, i}
+            <option value={i + 1}>{i + 1}列目</option>
+          {/each}
+        </select>
+      </div>
+    </div>
     <div class="flex gap-4">
       <button
         type="button"

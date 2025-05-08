@@ -12,7 +12,7 @@
 
   let coreMsg = writable("");
   let openError = writable("");
-  let retrievedRows = writable<Array<Array<string>>>([]);
+  let retrievedLines = writable<Array<Array<string>>>([]);
   let idColumnIndex = writable<number | null>(null);
   let isGakuyukaiColumnIndex = writable<number | null>(null);
 
@@ -46,10 +46,10 @@
   }
 
   function loadInitialData(path: string) {
-    invoke("read_excel_rows", { path, numRows: 3 })
-      .then((rows: any[string]) => {
-        console.log(rows);
-        retrievedRows.set(rows);
+    invoke("read_excel_lines", { path, numLines: 3 })
+      .then((lines: any[string]) => {
+        console.log(lines);
+        retrievedLines.set(lines);
       })
       .catch((e) => {
         console.error(e);
@@ -60,8 +60,8 @@
     if ($idColumnIndex !== null && $isGakuyukaiColumnIndex !== null) {
       invoke("wrap_load_gakuyukai_members", {
         path: $coreMsg,
-        idRow: $idColumnIndex,
-        isRow: $isGakuyukaiColumnIndex,
+        idLine: $idColumnIndex,
+        isLine: $isGakuyukaiColumnIndex,
       })
         .then(() => {
           console.info("Successfully loaded gakuyukai file");
@@ -106,7 +106,7 @@
   </div>
 </div>
 <!-- Column Selection Card -->
-{#if $retrievedRows.length > 0}
+{#if $retrievedLines.length > 0}
   <div class="card max-w-2xl mx-auto my-8">
     <div class="space-y-3">
       <h3 class="text-xl font-medium text-[--macos-text-primary]">列を選択:</h3>
@@ -114,12 +114,27 @@
         <table>
           <thead>
             <tr>
-              {#each $retrievedRows[0] as header, idx}
+              {#each $retrievedLines[0] as header, idx}
                 <th
                   class={idx === $idColumnIndex ||
                   idx === $isGakuyukaiColumnIndex
                     ? "selected-column"
                     : ""}
+                  on:click={() => {
+                    // 学籍番号の列が未選択の場合、まずそれを選択
+                    if ($idColumnIndex === null) {
+                      idColumnIndex.set(idx);
+                    }
+                    // 学籍番号の列が選択済みで、かつ現在の列が学籍番号の列と異なる場合、学友会の列として選択
+                    else if (
+                      $idColumnIndex !== null &&
+                      idx !== $idColumnIndex &&
+                      $isGakuyukaiColumnIndex === null
+                    ) {
+                      isGakuyukaiColumnIndex.set(idx);
+                    }
+                  }}
+                  style="cursor: pointer;"
                 >
                   {header || `列 ${idx + 1}`}
                 </th>
@@ -127,14 +142,29 @@
             </tr>
           </thead>
           <tbody>
-            {#each $retrievedRows.slice(1) as row}
+            {#each $retrievedLines.slice(1) as line}
               <tr>
-                {#each row as cell, idx}
+                {#each line as cell, idx}
                   <td
                     class={idx === $idColumnIndex ||
                     idx === $isGakuyukaiColumnIndex
                       ? "selected-column"
                       : ""}
+                    on:click={() => {
+                      // 学籍番号の列が未選択の場合、まずそれを選択
+                      if ($idColumnIndex === null) {
+                        idColumnIndex.set(idx);
+                      }
+                      // 学籍番号の列が選択済みで、かつ現在の列が学籍番号の列と異なる場合、学友会の列として選択
+                      else if (
+                        $idColumnIndex !== null &&
+                        idx !== $idColumnIndex &&
+                        $isGakuyukaiColumnIndex === null
+                      ) {
+                        isGakuyukaiColumnIndex.set(idx);
+                      }
+                    }}
+                    style="cursor: pointer;"
                   >
                     {cell}
                   </td>
@@ -158,7 +188,7 @@
             class="form-select"
           >
             <option value={null}>選択してください</option>
-            {#each $retrievedRows[0] as _, idx}
+            {#each $retrievedLines[0] as _, idx}
               <option value={idx}>列 {idx + 1}</option>
             {/each}
           </select>
@@ -176,7 +206,7 @@
             class="form-select"
           >
             <option value={null}>選択してください</option>
-            {#each $retrievedRows[0] as _, idx}
+            {#each $retrievedLines[0] as _, idx}
               <option value={idx}>列 {idx + 1}</option>
             {/each}
           </select>
@@ -207,5 +237,20 @@
 <style>
   .selected-column {
     background-color: rgba(59, 130, 246, 0.2); /* Light blue background */
+    transition: background-color 0.2s ease;
+  }
+
+  td,
+  th {
+    transition: background-color 0.2s ease;
+  }
+
+  td:hover,
+  th:hover {
+    background-color: rgba(59, 130, 246, 0.1);
+  }
+
+  .selected-column:hover {
+    background-color: rgba(59, 130, 246, 0.3);
   }
 </style>

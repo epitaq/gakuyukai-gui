@@ -1,7 +1,5 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "gakuyukai-gui",
-  "version": "0.1.0",
   "identifier": "com.gakuyukai-gui.app",
   "build": {
     "beforeDevCommand": "npm run dev",
@@ -12,7 +10,7 @@
   "app": {
     "windows": [
       {
-        "title": "gakuyukai-gui",
+        "title": "学友会率計算",
         "width": 1024,
         "height": 768
       }
