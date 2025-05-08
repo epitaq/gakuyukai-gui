@@ -2,46 +2,6 @@
 
 このアプリは、学友会の参加率を簡単に計算するためのデスクトップアプリケーションです。
 
-## 開発環境
-
-- OS: MacOS (バージョン 15.4.1)
-- Node.js:  (バージョン v22.15.0)
-- RustとCargo: (Cargo バージョン 1.86.0)
-
-##  開発方法
-
-1. リポジトリをクローンします：
-
-   ```bash
-   git clone git@github.com:epitaq/gakuyukai-gui.git
-   cd gakuyukai-gui
-   ```
-
-2. 依存関係をインストールします：
-
-   ```bash
-   npm install
-   ```
-
-### 開発サーバーの起動
-
-開発モードでアプリを起動するには、以下のコマンドを実行します：
-
-```bash
-npm run tauri dev
-```
-
-
-### ビルド
-
-リリース用のビルドを作成するには、以下のコマンドを実行します：
-
-```bash
-npm run tauri build
-```
-
-ビルドされたアプリは `src-tauri/target/release` に生成されます。
-
 ## 使用方法
 
 [test](./test) フォルダには、試用できるダミーデータが含まれています。
@@ -83,3 +43,44 @@ test
 6. 「エクスポート」ボタンで結果をExcelファイルに出力できます。団体名はこの画面で直接編集可能です。
 
    ![結果画面](docs/image/screenshot5.png "結果画面")
+
+
+## 開発環境
+
+- OS: MacOS (バージョン 15.4.1)
+- Node.js:  (バージョン v22.15.0)
+- RustとCargo: (Cargo バージョン 1.86.0)
+
+##  開発
+
+1. リポジトリをクローンします：
+
+   ```bash
+   git clone git@github.com:epitaq/gakuyukai-gui.git
+   cd gakuyukai-gui
+   ```
+
+2. 依存関係をインストールします：
+
+   ```bash
+   npm install
+   ```
+
+### 開発サーバーの起動
+
+開発モードでアプリを起動するには、以下のコマンドを実行します：
+
+```bash
+npm run tauri dev
+```
+
+
+### ビルド
+
+リリース用のビルドを作成するには、以下のコマンドを実行します：
+
+```bash
+npm run tauri build
+```
+
+ビルドされたアプリは `src-tauri/target/release` に生成されます。
