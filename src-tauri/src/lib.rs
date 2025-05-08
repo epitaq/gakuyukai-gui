@@ -1,6 +1,6 @@
 mod data_processing;
 
-use data_processing::{read_excel_rows, CircleGakuyukaiRates, CircleInfo, GakuyukaiMembers};
+use data_processing::{read_excel_lines, CircleGakuyukaiRates, CircleInfo, GakuyukaiMembers};
 use log::debug;
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 use tauri::Manager;
@@ -16,11 +16,11 @@ fn greet(name: &str) -> String {
 fn wrap_load_gakuyukai_members(
     state: tauri::State<'_, GakuyukaiMembers>,
     path: String,
-    id_row: i64,
-    is_row: i64,
+    id_line: i64,
+    is_line: i64,
 ) -> Result<(), String> {
     debug!("wrap_load_gakuyukai_members");
-    let _ = state.load_gakuyukai_members_self(&path, id_row, is_row)?;
+    let _ = state.load_gakuyukai_members_self(&path, id_line, is_line)?;
     Ok(())
 }
 
@@ -42,27 +42,27 @@ fn wrap_get_info(state: tauri::State<'_, GakuyukaiMembers>) -> CircleInfo {
 fn wrap_calculate_gakuyukai_rate(
     state: tauri::State<'_, GakuyukaiMembers>,
     path: &str,
-    id_row: i64,
-    name_row: i64,
+    id_line: i64,
+    name_line: i64,
 ) -> Result<CircleInfo, String> {
     debug!("wrap_calculate_rakuyukai_rate");
     state
-        .calculate_gakuyukai_rate(&path, id_row, name_row)?
+        .calculate_gakuyukai_rate(&path, id_line, name_line)?
         .print();
-    return state.calculate_gakuyukai_rate(&path, id_row, name_row);
+    return state.calculate_gakuyukai_rate(&path, id_line, name_line);
 }
 #[tauri::command]
 fn wrap_calculate_gakuyukai_rates(
     state: tauri::State<'_, GakuyukaiMembers>,
     path: &str,
-    id_row: i64,
-    name_row: i64,
+    id_line: i64,
+    name_line: i64,
 ) -> Result<CircleGakuyukaiRates, String> {
     debug!("wrap_calculate_rakuyukai_rate");
     state
-        .calculate_gakuyukai_rates(&path, id_row, name_row)?
+        .calculate_gakuyukai_rates(&path, id_line, name_line)?
         .print();
-    return state.calculate_gakuyukai_rates(&path, id_row, name_row);
+    return state.calculate_gakuyukai_rates(&path, id_line, name_line);
 }
 
 #[tauri::command]
@@ -112,7 +112,7 @@ pub fn run() {
             wrap_calculate_gakuyukai_rate,
             wrap_calculate_gakuyukai_rates,
             wrap_export_to_excel,
-            read_excel_rows,
+            read_excel_lines,
         ])
         .setup(|app| {
             let gakuyukai = GakuyukaiMembers::default();

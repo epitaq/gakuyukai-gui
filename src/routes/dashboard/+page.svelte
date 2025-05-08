@@ -16,8 +16,8 @@
     rate_string: string;
   };
 
-  let idRow = 1;
-  let nameRow = 2;
+  let idLine = 1;
+  let nameLine = 2;
 
   // 初期値を設定
   let info: Info = {
@@ -93,7 +93,7 @@
 
     if (selected) {
       goto(
-        `/gakuyukai-rates?mode=single&path=${encodeURIComponent(selected)}&idRow=${idRow}&nameRow=${nameRow}`,
+        `/gakuyukai-rates?mode=single&path=${encodeURIComponent(selected)}&idLine=${idLine}&nameLine=${nameLine}`,
       );
     }
   }
@@ -107,7 +107,7 @@
 
     if (selected) {
       goto(
-        `/gakuyukai-rates?mode=multiple&path=${encodeURIComponent(selected)}&idRow=${idRow}&nameRow=${nameRow}`,
+        `/gakuyukai-rates?mode=multiple&path=${encodeURIComponent(selected)}&idLine=${idLine}&nameLine=${nameLine}`,
       );
     }
   }
@@ -162,10 +162,10 @@
     </h3>
     <div class="flex gap-4 items-center mb-4">
       <div class="flex items-center gap-2">
-        <label for="idRow" class="text-[--macos-text-secondary]">ID行:</label>
+        <label for="idLine" class="text-[--macos-text-secondary]">ID行:</label>
         <select
-          id="idRow"
-          bind:value={idRow}
+          id="idLine"
+          bind:value={idLine}
           class="px-2 py-1 rounded border border-[--macos-border] bg-[--macos-background]"
         >
           {#each Array(10) as _, i}
@@ -174,12 +174,12 @@
         </select>
       </div>
       <div class="flex items-center gap-2">
-        <label for="nameRow" class="text-[--macos-text-secondary]"
+        <label for="nameLine" class="text-[--macos-text-secondary]"
           >名前行:</label
         >
         <select
-          id="nameRow"
-          bind:value={nameRow}
+          id="nameLine"
+          bind:value={nameLine}
           class="px-2 py-1 rounded border border-[--macos-border] bg-[--macos-background]"
         >
           {#each Array(10) as _, i}

@@ -20,8 +20,8 @@
 
   let result: CircleGakuyukaiRates | null = null;
   let loading = false;
-  let idRow = 1;
-  let nameRow = 2;
+  let idLine = 1;
+  let nameLine = 2;
 
   function convertSingleToMultiple(single: CircleInfo): CircleGakuyukaiRates {
     return {
@@ -33,15 +33,15 @@
   onMount(() => {
     const path = $page.url.searchParams.get("path");
     const mode = $page.url.searchParams.get("mode");
-    const queryIdRow = $page.url.searchParams.get("idRow");
-    const queryNameRow = $page.url.searchParams.get("nameRow");
+    const queryIdLine = $page.url.searchParams.get("idLine");
+    const queryNameLine = $page.url.searchParams.get("nameLine");
 
     // クエリパラメータから値を設定
-    if (queryIdRow) {
-      idRow = parseInt(queryIdRow);
+    if (queryIdLine) {
+      idLine = parseInt(queryIdLine);
     }
-    if (queryNameRow) {
-      nameRow = parseInt(queryNameRow);
+    if (queryNameLine) {
+      nameLine = parseInt(queryNameLine);
     }
 
     if (path && mode) {
@@ -57,8 +57,8 @@
           "wrap_calculate_gakuyukai_rate",
           {
             path: decodeURIComponent(path),
-            idRow: idRow - 1,
-            nameRow: nameRow - 1,
+            idLine: idLine - 1,
+            nameLine: nameLine - 1,
           },
         );
         result = convertSingleToMultiple(singleResult);
@@ -67,8 +67,8 @@
           "wrap_calculate_gakuyukai_rates",
           {
             path: decodeURIComponent(path),
-            idRow: idRow - 1,
-            nameRow: nameRow - 1,
+            idLine: idLine - 1,
+            nameLine: nameLine - 1,
           },
         );
       }
@@ -93,7 +93,7 @@
         try {
           const singleResult = await invoke<CircleInfo>(
             "wrap_calculate_gakuyukai_rate",
-            { path: selected, idRow: idRow - 1, nameRow: nameRow - 1 },
+            { path: selected, idLine: idLine - 1, nameLine: nameLine - 1 },
           );
           result = convertSingleToMultiple(singleResult);
         } catch (error) {
@@ -121,7 +121,7 @@
         try {
           result = await invoke<CircleGakuyukaiRates>(
             "wrap_calculate_gakuyukai_rates",
-            { path: selected, idRow: idRow - 1, nameRow: nameRow - 1 },
+            { path: selected, idLine: idLine - 1, nameLine: nameLine - 1 },
           );
         } catch (error) {
           console.error("Error calculating rates:", error);
@@ -173,12 +173,12 @@
       <p class="text-[--macos-text-secondary] mt-1">団体ごとの学友会率を計算</p>
       <div class="flex gap-4 mt-2">
         <div class="flex items-center gap-2">
-          <label for="idRow" class="text-[--macos-text-secondary]"
+          <label for="idLine" class="text-[--macos-text-secondary]"
             >学籍番号列:</label
           >
           <select
-            id="idRow"
-            bind:value={idRow}
+            id="idLine"
+            bind:value={idLine}
             class="px-2 py-1 rounded border border-[--macos-border] bg-[--macos-background]"
           >
             {#each Array(10) as _, i}
@@ -187,12 +187,12 @@
           </select>
         </div>
         <div class="flex items-center gap-2">
-          <label for="nameRow" class="text-[--macos-text-secondary]"
+          <label for="nameLine" class="text-[--macos-text-secondary]"
             >名前列:</label
           >
           <select
-            id="nameRow"
-            bind:value={nameRow}
+            id="nameLine"
+            bind:value={nameLine}
             class="px-2 py-1 rounded border border-[--macos-border] bg-[--macos-background]"
           >
             {#each Array(10) as _, i}

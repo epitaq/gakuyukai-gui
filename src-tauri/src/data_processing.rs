@@ -122,7 +122,7 @@ impl GakuyukaiMembers {
     // const ID_ROW: i64 = 0;
     // const IS_ROW: i64 = 2;
     /// 学友会メンバーのリストをExcelファイルから読み込む関数
-    pub fn load_gakuyukai_members(path: &str, id_row: i64, is_row: i64) -> Result<Self, String> {
+    pub fn load_gakuyukai_members(path: &str, id_line: i64, is_line: i64) -> Result<Self, String> {
         info!("Loading gakuyukai members from file: {}", path);
 
         let mut member_ids: Vec<i64> = Vec::new();
@@ -133,10 +133,10 @@ impl GakuyukaiMembers {
         debug!("Processing sheet: {}", sheet_name);
         if let Ok(range) = workbook.worksheet_range(&sheet_name) {
             debug!("range.width: {}", range.width());
-            if range.width() > id_row as usize && range.width() > is_row as usize {
-                for row in range.rows() {
-                    let student_id: Option<i64> = row[id_row as usize].as_i64();
-                    let is_gakuyukai_member: Option<bool> = row[is_row as usize].get_bool();
+            if range.width() > id_line as usize && range.width() > is_line as usize {
+                for line in range.rows() {
+                    let student_id: Option<i64> = line[id_line as usize].as_i64();
+                    let is_gakuyukai_member: Option<bool> = line[is_line as usize].get_bool();
                     if student_id.is_some_and(|id| (1_000_000..=9_999_999).contains(&id)) {
                         if is_gakuyukai_member.is_some_and(|g| g) {
                             member_ids.push(student_id.unwrap());
@@ -166,11 +166,11 @@ impl GakuyukaiMembers {
     pub fn load_gakuyukai_members_self(
         &self,
         path: &str,
-        id_row: i64,
-        is_row: i64,
+        id_line: i64,
+        is_line: i64,
     ) -> Result<(), String> {
         // Attempt to load the gakuyukai members from the given path
-        match GakuyukaiMembers::load_gakuyukai_members(path, id_row, is_row) {
+        match GakuyukaiMembers::load_gakuyukai_members(path, id_line, is_line) {
             Ok(gakuyukai) => {
                 // Acquire the lock and update the member_ids
                 let mut self_gakuyukai_id = self.member_ids.lock().unwrap();
@@ -192,8 +192,8 @@ impl GakuyukaiMembers {
     pub fn calculate_gakuyukai_rate(
         &self,
         path: &str,
-        id_row: i64,
-        name_row: i64,
+        id_line: i64,
+        name_line: i64,
     ) -> Result<CircleInfo, String> {
         info!("Calculating gakuyukai rate for file: {}", path);
 
@@ -205,7 +205,7 @@ impl GakuyukaiMembers {
         }
 
         // サークルメンバーを読み込む
-        let circle_members: Vec<Student> = Students::load_circle_members(path, id_row, name_row)?
+        let circle_members: Vec<Student> = Students::load_circle_members(path, id_line, name_line)?
             .students
             .iter()
             .map(|s| Student {
@@ -262,8 +262,8 @@ impl GakuyukaiMembers {
     pub fn calculate_gakuyukai_rates(
         &self,
         directory_path: &str,
-        id_row: i64,
-        name_row: i64,
+        id_line: i64,
+        name_line: i64,
     ) -> Result<CircleGakuyukaiRates, String> {
         info!(
             "Calculating gakuyukai rates for directory: {}",
@@ -282,7 +282,7 @@ impl GakuyukaiMembers {
                 let file_path = path.to_string_lossy().into_owned();
                 if check_excel_file_path(&file_path) {
                     debug!("Processing file: {}", file_path);
-                    let result = self.calculate_gakuyukai_rate(&file_path, id_row, name_row);
+                    let result = self.calculate_gakuyukai_rate(&file_path, id_line, name_line);
                     (file_path, result)
                 } else {
                     warn!("Skipping non-Excel file: {}", &file_path);
@@ -319,7 +319,7 @@ impl Students {
     // const NAME_ROW: i64 = 1;
 
     /// サークルメンバーの情報をExcelファイルから読み込む関数
-    fn load_circle_members(path: &str, id_row: i64, name_row: i64) -> Result<Self, String> {
+    fn load_circle_members(path: &str, id_line: i64, name_line: i64) -> Result<Self, String> {
         info!("Loading circle members from file: {}", path);
 
         let mut members: Vec<Student> = Vec::new();
@@ -327,10 +327,10 @@ impl Students {
         let sheet_names = workbook.sheet_names();
         let sheet_name = sheet_names.first().unwrap();
         if let Ok(range) = workbook.worksheet_range(&sheet_name) {
-            if range.width() > id_row as usize && range.width() > name_row as usize {
-                for row in range.rows() {
-                    let student_id: Option<i64> = row[id_row as usize].as_i64();
-                    let student_name: Option<String> = row[name_row as usize].as_string();
+            if range.width() > id_line as usize && range.width() > name_line as usize {
+                for line in range.rows() {
+                    let student_id: Option<i64> = line[id_line as usize].as_i64();
+                    let student_name: Option<String> = line[name_line as usize].as_string();
                     if student_id.is_some_and(|id| (1_000_000..=9_999_999).contains(&id))
                         && student_name.is_some()
                     {
@@ -404,12 +404,12 @@ impl CircleGakuyukaiRates {
 
         // サマリーシートにデータを書き込む
         for (i, circle) in self.circles.iter().enumerate() {
-            let row = (i + 1) as u32;
-            summary.write(row, 0, &circle.name)?;
-            summary.write_with_format(row, 1, circle.rate, &percent_format)?;
-            summary.write_with_format(row, 2, circle.member_count as i32, &center_format)?;
+            let line = (i + 1) as u32;
+            summary.write(line, 0, &circle.name)?;
+            summary.write_with_format(line, 1, circle.rate, &percent_format)?;
+            summary.write_with_format(line, 2, circle.member_count as i32, &center_format)?;
             summary.write_with_format(
-                row,
+                line,
                 3,
                 circle.gakuyukai_member_count as i32,
                 &center_format,
@@ -435,14 +435,14 @@ impl CircleGakuyukaiRates {
 
                 // メンバーデータを書き込む
                 for (j, student) in members.students.iter().enumerate() {
-                    let row = (j + 1) as u32;
-                    member_sheet.write_with_format(row, 0, student.id as i32, &center_format)?;
-                    member_sheet.write(row, 1, &student.name)?;
+                    let line = (j + 1) as u32;
+                    member_sheet.write_with_format(line, 0, student.id as i32, &center_format)?;
+                    member_sheet.write(line, 1, &student.name)?;
                     let gakuyukai_status = match student.is_gakuyukai.unwrap_or(false) {
                         true => "○",
                         false => "",
                     };
-                    member_sheet.write_with_format(row, 2, gakuyukai_status, &gakuyukai_format)?;
+                    member_sheet.write_with_format(line, 2, gakuyukai_status, &gakuyukai_format)?;
                 }
 
                 // メンバーシートの列幅を調整
@@ -552,8 +552,8 @@ pub fn check_excel_file_path(path: &str) -> bool {
 }
 
 #[tauri::command]
-pub fn read_excel_rows(path: &str, num_rows: usize) -> Result<Vec<Vec<String>>, String> {
-    debug!("Reading rows from Excel file: {}", path);
+pub fn read_excel_lines(path: &str, num_lines: usize) -> Result<Vec<Vec<String>>, String> {
+    debug!("Reading lines from Excel file: {}", path);
 
     if !check_excel_file_path(path) {
         let message: String =
@@ -571,24 +571,27 @@ pub fn read_excel_rows(path: &str, num_rows: usize) -> Result<Vec<Vec<String>>, 
         .first()
         .ok_or("No sheets found in the Excel file")?;
 
-    debug!("Reading up to {} rows from sheet: {}", num_rows, sheet_name);
+    debug!(
+        "Reading up to {} lines from sheet: {}",
+        num_lines, sheet_name
+    );
 
     // Attempt to obtain the range of data from the specified sheet
     let range = workbook
         .worksheet_range(sheet_name)
         .map_err(|_| format!("Failed to read the range of sheet: {}", sheet_name))?;
 
-    // Collect the rows up to the specified number
-    let rows: Vec<Vec<String>> = range
+    // Collect the lines up to the specified number
+    let lines: Vec<Vec<String>> = range
         .rows()
-        .take(num_rows)
-        .map(|row| row.to_vec().iter().map(|cell| cell.to_string()).collect())
+        .take(num_lines)
+        .map(|line| line.to_vec().iter().map(|cell| cell.to_string()).collect())
         .collect();
 
-    // Check if any rows were read
-    if rows.is_empty() {
-        return Err("No data found in the specified rows".to_string());
+    // Check if any lines were read
+    if lines.is_empty() {
+        return Err("No data found in the specified lines".to_string());
     }
 
-    Ok(rows)
+    Ok(lines)
 }
