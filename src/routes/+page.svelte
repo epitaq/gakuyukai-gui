@@ -120,6 +120,21 @@
                   idx === $isGakuyukaiColumnIndex
                     ? "selected-column"
                     : ""}
+                  on:click={() => {
+                    // 学籍番号の列が未選択の場合、まずそれを選択
+                    if ($idColumnIndex === null) {
+                      idColumnIndex.set(idx);
+                    }
+                    // 学籍番号の列が選択済みで、かつ現在の列が学籍番号の列と異なる場合、学友会の列として選択
+                    else if (
+                      $idColumnIndex !== null &&
+                      idx !== $idColumnIndex &&
+                      $isGakuyukaiColumnIndex === null
+                    ) {
+                      isGakuyukaiColumnIndex.set(idx);
+                    }
+                  }}
+                  style="cursor: pointer;"
                 >
                   {header || `列 ${idx + 1}`}
                 </th>
@@ -135,6 +150,21 @@
                     idx === $isGakuyukaiColumnIndex
                       ? "selected-column"
                       : ""}
+                    on:click={() => {
+                      // 学籍番号の列が未選択の場合、まずそれを選択
+                      if ($idColumnIndex === null) {
+                        idColumnIndex.set(idx);
+                      }
+                      // 学籍番号の列が選択済みで、かつ現在の列が学籍番号の列と異なる場合、学友会の列として選択
+                      else if (
+                        $idColumnIndex !== null &&
+                        idx !== $idColumnIndex &&
+                        $isGakuyukaiColumnIndex === null
+                      ) {
+                        isGakuyukaiColumnIndex.set(idx);
+                      }
+                    }}
+                    style="cursor: pointer;"
                   >
                     {cell}
                   </td>
@@ -207,5 +237,20 @@
 <style>
   .selected-column {
     background-color: rgba(59, 130, 246, 0.2); /* Light blue background */
+    transition: background-color 0.2s ease;
+  }
+
+  td,
+  th {
+    transition: background-color 0.2s ease;
+  }
+
+  td:hover,
+  th:hover {
+    background-color: rgba(59, 130, 246, 0.1);
+  }
+
+  .selected-column:hover {
+    background-color: rgba(59, 130, 246, 0.3);
   }
 </style>
