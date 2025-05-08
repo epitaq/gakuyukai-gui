@@ -174,7 +174,7 @@
       <div class="flex gap-4 mt-2">
         <div class="flex items-center gap-2">
           <label for="idLine" class="text-[--macos-text-secondary]"
-            >学籍番号列:</label
+            >学籍番号:</label
           >
           <select
             id="idLine"
@@ -188,7 +188,7 @@
         </div>
         <div class="flex items-center gap-2">
           <label for="nameLine" class="text-[--macos-text-secondary]"
-            >名前列:</label
+            >名前:</label
           >
           <select
             id="nameLine"
@@ -276,7 +276,7 @@
     {/if}
     {#if result?.error_file_path.length}
       <div class="card border-red-200">
-        <h3 class="text-red-400">エラーファイル</h3>
+        <h3 class="text-red-400">エラー</h3>
         <ul class="space-y-2 error-scrollable">
           {#each result.error_file_path as errorPath}
             <li class="text-red-400">{errorPath}</li>
