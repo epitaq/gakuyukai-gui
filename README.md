@@ -4,6 +4,8 @@
 
 ## 使用方法
 
+ダウンロードは[こちら](https://github.com/epitaq/gakuyukai-gui/releases)
+
 [test](./test) フォルダには、試用できるダミーデータが含まれています。
 
 ```
