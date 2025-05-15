@@ -1,10 +1,21 @@
 mod data_processing;
-
 use data_processing::{read_excel_lines, CircleGakuyukaiRates, CircleInfo, GakuyukaiMembers};
-use log::debug;
+use log::{debug, info};
+use serde::Serialize;
+use serde_json::Value;
+use std::fs::OpenOptions;
+use std::io::{Read, Write};
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 use tauri::Manager;
 use tauri_plugin_log::{Target, TargetKind};
+
+#[derive(Serialize)]
+struct GakuyukaiFile {
+    path: String,
+    id_line: i64,
+    is_line: i64,
+    timestamp: i64,
+}
 
 #[tauri::command]
 fn greet(name: &str) -> String {
@@ -21,6 +32,7 @@ fn wrap_load_gakuyukai_members(
 ) -> Result<(), String> {
     debug!("wrap_load_gakuyukai_members");
     let _ = state.load_gakuyukai_members_self(&path, id_line, is_line)?;
+    let _ = export_to_json(path, id_line, is_line);
     Ok(())
 }
 
@@ -70,6 +82,56 @@ fn wrap_export_to_excel(rates: CircleGakuyukaiRates, path: &str) -> Result<(), S
     rates
         .export_to_excel(path)
         .map_err(|e| format!("Failed to export data to Excel: {}", e))
+}
+
+fn export_to_json(path: String, id_line: i64, is_line: i64) -> Result<(), String> {
+    info!(
+        "Exporting to JSON: path={}, id_line={}, is_line={}",
+        path, id_line, is_line
+    );
+    let file_path: &str = "/Users/epita/Documents/dev/gakuyukai-gui/data.json";
+    let data = GakuyukaiFile {
+        path,
+        id_line,
+        is_line,
+        timestamp: chrono::Utc::now().timestamp(),
+    };
+
+    // JSONにシリアライズ
+    let new_data_json =
+        serde_json::to_value(&data).map_err(|e| format!("Failed to serialize data: {}", e))?;
+
+    // JSONファイルを確認し、存在しない場合は新しく作成
+    let mut file = OpenOptions::new()
+        .read(true)
+        .write(true)
+        .create(true)
+        .open(file_path)
+        .map_err(|e| format!("Failed to open file: {}", e))?;
+
+    let mut contents = String::new();
+    file.read_to_string(&mut contents)
+        .map_err(|e| format!("Failed to read file: {}", e))?;
+
+    let mut json_data: Vec<Value> = if !contents.is_empty() {
+        serde_json::from_str(&contents).map_err(|e| format!("Failed to parse JSON: {}", e))?
+    } else {
+        Vec::new()
+    };
+
+    json_data.push(new_data_json);
+
+    // ファイル内容を上書き
+    file.set_len(0)
+        .map_err(|e| format!("Failed to truncate file: {}", e))?;
+    file.write_all(
+        serde_json::to_string(&json_data)
+            .map_err(|e| format!("Failed to serialize JSON: {}", e))?
+            .as_bytes(),
+    )
+    .map_err(|e| format!("Failed to write to file: {}", e))?;
+
+    Ok(())
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
