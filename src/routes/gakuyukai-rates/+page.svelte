@@ -284,6 +284,9 @@
         </ul>
       </div>
     {/if}
+    <div class="mt-6 flex justify-end">
+      <button class="btn" on:click={() => history.back()}> 戻る </button>
+    </div>
   </div>
 </div>
 
