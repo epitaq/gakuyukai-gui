@@ -1,6 +1,6 @@
 [package]
 name = "gakuyukai-gui"
-version = "0.1.1"
+version = "0.1.2"
 description = "学友会率計算アプリ"
 authors = ["えぴた"]
 edition = "2021"
