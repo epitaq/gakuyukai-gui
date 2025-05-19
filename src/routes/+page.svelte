@@ -1,5 +1,6 @@
 <script lang="ts">
   import { invoke } from "@tauri-apps/api/core";
+  import { listen } from "@tauri-apps/api/event";
   import { goto } from "$app/navigation";
   import {
     open,
@@ -16,11 +17,27 @@
   let idColumnIndex = writable<number | null>(null);
   let isGakuyukaiColumnIndex = writable<number | null>(null);
 
+  // Infoの型定義
+  type Info = {
+    name: string;
+    file_path: string;
+    member_count: number;
+    gakuyukai_member_count: number;
+    rate_string: string;
+  };
+
   onMount(() => {
     const path = $page.url.searchParams.get("path");
     if (path && !$coreMsg) {
       coreMsg.set(path);
       loadInitialData(path);
+    }
+    if (!path) {
+      invoke<Info>("wrap_get_info").then((data) => {
+        if (data.member_count > 0) {
+          goto("/dashboard");
+        }
+      });
     }
   });
 

@@ -6,7 +6,7 @@ use serde_json::Value;
 use std::fs::{create_dir_all, File};
 use std::io::{Read, Write};
 use std::path::PathBuf;
-use tauri::Manager;
+use tauri::{Emitter, Manager};
 use tauri_plugin_log::{Target, TargetKind};
 
 #[derive(Serialize)]
@@ -224,8 +224,53 @@ pub fn run() {
         .setup(|app| {
             let gakuyukai = GakuyukaiMembers::default();
             let app_data_dir = app.path().app_data_dir().unwrap();
-            app.manage(gakuyukai);
+            match File::open(app_data_dir.join("gakuyukai_member.json")) {
+                Ok(mut file) => {
+                    info!("File exists");
+                    let mut contents = String::new();
+                    file.read_to_string(&mut contents).map_err(|e| {
+                        let msg = format!("Failed to read file: {}", e);
+                        error!("{}", msg);
+                        msg
+                    })?;
+                    debug!("File contents: {}", contents);
+                    let json_data: Vec<Value> = serde_json::from_str(&contents).map_err(|e| {
+                        let msg = format!("Failed to parse JSON: {}", e);
+                        error!("{}", msg);
+                        msg
+                    })?;
+                    debug!("Parsed JSON data: {:?}", json_data);
+                    let latest_data = json_data.last().ok_or("No data found")?;
+                    let path = latest_data["path"]
+                        .as_str()
+                        .ok_or("Failed to get path from JSON")?;
+                    let id_line = latest_data["id_line"]
+                        .as_i64()
+                        .ok_or("Failed to get id_line from JSON")?;
+                    let is_line = latest_data["is_line"]
+                        .as_i64()
+                        .ok_or("Failed to get is_line from JSON")?;
+                    gakuyukai
+                        .load_gakuyukai_members_self(path, id_line, is_line)
+                        .map_err(|e| {
+                            let msg = format!("Failed to load Gakuyukai members: {}", e);
+                            error!("{}", msg);
+                            msg
+                        })?;
+                    // フロントへイベント発行
+                    app.emit("navigate", "dashboard")
+                        .expect("Failed to emit event");
+                }
+                Err(e) => {
+                    if e.kind() == std::io::ErrorKind::NotFound {
+                        info!("File does not exist");
+                    } else {
+                        error!("Error opening file: {}", e);
+                    }
+                }
+            }
             app.manage(app_data_dir);
+            app.manage(gakuyukai);
             Ok(())
         })
         .run(tauri::generate_context!())
