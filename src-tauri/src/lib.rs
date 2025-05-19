@@ -1,11 +1,11 @@
 mod data_processing;
 use data_processing::{read_excel_lines, CircleGakuyukaiRates, CircleInfo, GakuyukaiMembers};
-use log::{debug, info};
+use log::{debug, error, info};
 use serde::Serialize;
 use serde_json::Value;
-use std::fs::OpenOptions;
+use std::fs::{create_dir_all, OpenOptions};
 use std::io::{Read, Write};
-// Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
+use std::path::PathBuf;
 use tauri::Manager;
 use tauri_plugin_log::{Target, TargetKind};
 
@@ -26,13 +26,16 @@ fn greet(name: &str) -> String {
 #[tauri::command]
 fn wrap_load_gakuyukai_members(
     state: tauri::State<'_, GakuyukaiMembers>,
+    export_path: tauri::State<'_, PathBuf>,
     path: String,
     id_line: i64,
     is_line: i64,
 ) -> Result<(), String> {
     debug!("wrap_load_gakuyukai_members");
     let _ = state.load_gakuyukai_members_self(&path, id_line, is_line)?;
-    let _ = export_to_json(path, id_line, is_line);
+
+    let export = export_path.join("gakuyukai_member.json");
+    let _ = export_to_json(export, path, id_line, is_line);
     Ok(())
 }
 
@@ -84,12 +87,20 @@ fn wrap_export_to_excel(rates: CircleGakuyukaiRates, path: &str) -> Result<(), S
         .map_err(|e| format!("Failed to export data to Excel: {}", e))
 }
 
-fn export_to_json(path: String, id_line: i64, is_line: i64) -> Result<(), String> {
+fn export_to_json(
+    export_path: PathBuf,
+    path: String,
+    id_line: i64,
+    is_line: i64,
+) -> Result<(), String> {
     info!(
-        "Exporting to JSON: path={}, id_line={}, is_line={}",
-        path, id_line, is_line
+        "Exporting to JSON: path={}, id_line={}, is_line={}, export_path={}",
+        path,
+        id_line,
+        is_line,
+        &export_path.to_str().unwrap()
     );
-    let file_path: &str = "/Users/epita/Documents/dev/gakuyukai-gui/data.json";
+    // let file_path: &str = "/Users/epita/Documents/dev/gakuyukai-gui/data.json";
     let data = GakuyukaiFile {
         path,
         id_line,
@@ -100,18 +111,26 @@ fn export_to_json(path: String, id_line: i64, is_line: i64) -> Result<(), String
     // JSONにシリアライズ
     let new_data_json =
         serde_json::to_value(&data).map_err(|e| format!("Failed to serialize data: {}", e))?;
+    debug!("Serialized JSON: {:?}", new_data_json);
+
+    // dirを作成
+    let parent = export_path.parent().unwrap();
+    create_dir_all(parent).unwrap_or_else(|why| {
+        error!("! {:?}", why.kind());
+    });
 
     // JSONファイルを確認し、存在しない場合は新しく作成
     let mut file = OpenOptions::new()
         .read(true)
         .write(true)
         .create(true)
-        .open(file_path)
+        .open(&export_path)
         .map_err(|e| format!("Failed to open file: {}", e))?;
 
     let mut contents = String::new();
     file.read_to_string(&mut contents)
         .map_err(|e| format!("Failed to read file: {}", e))?;
+    debug!("File contents: {}", contents);
 
     let mut json_data: Vec<Value> = if !contents.is_empty() {
         serde_json::from_str(&contents).map_err(|e| format!("Failed to parse JSON: {}", e))?
@@ -120,10 +139,11 @@ fn export_to_json(path: String, id_line: i64, is_line: i64) -> Result<(), String
     };
 
     json_data.push(new_data_json);
+    debug!("JSON data: {:?}", json_data);
 
     // ファイル内容を上書き
-    file.set_len(0)
-        .map_err(|e| format!("Failed to truncate file: {}", e))?;
+    // file.set_len(0)
+    //     .map_err(|e| format!("Failed to truncate file: {}", e))?;
     file.write_all(
         serde_json::to_string(&json_data)
             .map_err(|e| format!("Failed to serialize JSON: {}", e))?
@@ -144,7 +164,7 @@ pub fn run() {
             tauri_plugin_log::Builder::new()
                 .target(Target::new(TargetKind::Stdout))
                 .target(Target::new(TargetKind::Webview))
-                .level(log::LevelFilter::Info)
+                .level(log::LevelFilter::Debug)
                 .format(|out, message, record| {
                     let level_color = match record.level() {
                         log::Level::Error => "\x1b[31m", // Red
@@ -178,7 +198,9 @@ pub fn run() {
         ])
         .setup(|app| {
             let gakuyukai = GakuyukaiMembers::default();
+            let app_data_dir = app.path().app_data_dir().unwrap();
             app.manage(gakuyukai);
+            app.manage(app_data_dir);
             Ok(())
         })
         .run(tauri::generate_context!())
