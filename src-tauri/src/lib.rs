@@ -3,7 +3,7 @@ use data_processing::{read_excel_lines, CircleGakuyukaiRates, CircleInfo, Gakuyu
 use log::{debug, error, info};
 use serde::Serialize;
 use serde_json::Value;
-use std::fs::{create_dir_all, OpenOptions};
+use std::fs::{create_dir_all, File};
 use std::io::{Read, Write};
 use std::path::PathBuf;
 use tauri::Manager;
@@ -109,8 +109,11 @@ fn export_to_json(
     };
 
     // JSONにシリアライズ
-    let new_data_json =
-        serde_json::to_value(&data).map_err(|e| format!("Failed to serialize data: {}", e))?;
+    let new_data_json = serde_json::to_value(&data).map_err(|e| {
+        let msg = format!("Failed to serialize data: {}", e);
+        error!("{}", msg);
+        msg
+    })?;
     debug!("Serialized JSON: {:?}", new_data_json);
 
     // dirを作成
@@ -119,21 +122,32 @@ fn export_to_json(
         error!("! {:?}", why.kind());
     });
 
-    // JSONファイルを確認し、存在しない場合は新しく作成
-    let mut file = OpenOptions::new()
-        .read(true)
-        .write(true)
-        .create(true)
-        .open(&export_path)
-        .map_err(|e| format!("Failed to open file: {}", e))?;
-
+    // JSONファイルを確認し、存在しない場合はスキップ
     let mut contents = String::new();
-    file.read_to_string(&mut contents)
-        .map_err(|e| format!("Failed to read file: {}", e))?;
-    debug!("File contents: {}", contents);
+    match File::open(&export_path) {
+        Ok(mut file) => {
+            debug!("File exists, proceeding to read.");
+            file.read_to_string(&mut contents).map_err(|e| {
+                let msg = format!("Failed to read file: {}", e);
+                error!("{}", msg);
+                msg
+            })?;
+        }
+        Err(e) => {
+            if e.kind() == std::io::ErrorKind::NotFound {
+                debug!("File does not exist, creating a new one.");
+            } else {
+                return Err(format!("Failed to open file: {}", e));
+            }
+        }
+    }
 
     let mut json_data: Vec<Value> = if !contents.is_empty() {
-        serde_json::from_str(&contents).map_err(|e| format!("Failed to parse JSON: {}", e))?
+        serde_json::from_str(&contents).map_err(|e| {
+            let msg = format!("Failed to parse JSON: {}", e);
+            error!("{}", msg);
+            msg
+        })?
     } else {
         Vec::new()
     };
@@ -142,14 +156,25 @@ fn export_to_json(
     debug!("JSON data: {:?}", json_data);
 
     // ファイル内容を上書き
-    // file.set_len(0)
-    //     .map_err(|e| format!("Failed to truncate file: {}", e))?;
+    let mut file = File::create(&export_path).map_err(|e| {
+        let msg = format!("Failed to create file: {}", e);
+        error!("{}", msg);
+        msg
+    })?;
     file.write_all(
         serde_json::to_string(&json_data)
-            .map_err(|e| format!("Failed to serialize JSON: {}", e))?
+            .map_err(|e| {
+                let msg = format!("Failed to serialize JSON: {}", e);
+                error!("{}", msg);
+                msg
+            })?
             .as_bytes(),
     )
-    .map_err(|e| format!("Failed to write to file: {}", e))?;
+    .map_err(|e| {
+        let msg = format!("Failed to write to file: {}", e);
+        error!("{}", msg);
+        msg
+    })?;
 
     Ok(())
 }
