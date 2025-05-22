@@ -1,4 +1,4 @@
-name: "publish"
+name: "mac-universal-app"
 
 on:
   push:
